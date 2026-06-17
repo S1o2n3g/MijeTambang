@@ -1,0 +1,3360 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>미스터리 사건 탐험 아카이브</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Pretendard", "Apple SD Gothic Neo", Arial, sans-serif;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(255, 209, 102, 0.22), transparent 32%),
+        radial-gradient(circle at 88% 12%, rgba(116, 185, 255, 0.16), transparent 30%),
+        radial-gradient(circle at 50% 100%, rgba(157, 78, 221, 0.16), transparent 36%),
+        #0d111d;
+      color: #f6f1e8;
+    }
+
+    .app {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 30px 20px 60px;
+    }
+
+    header {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 30px;
+      padding: 34px 28px;
+      background: linear-gradient(145deg, rgba(255,255,255,.09), rgba(255,255,255,.035));
+      box-shadow: 0 24px 70px rgba(0,0,0,.32);
+    }
+
+    header::after {
+      content: "？";
+      position: absolute;
+      right: 28px;
+      top: 10px;
+      font-size: 150px;
+      font-weight: 900;
+      color: rgba(255,209,102,.08);
+      transform: rotate(12deg);
+    }
+
+    .badge {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      width: fit-content;
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: #ffd166;
+      background: rgba(255,209,102,.08);
+      border: 1px solid rgba(255,209,102,.35);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    h1 {
+      margin: 16px 0 12px;
+      font-size: clamp(32px, 5.6vw, 60px);
+      line-height: 1.05;
+      letter-spacing: -1.8px;
+    }
+
+    .lead {
+      position: relative;
+      z-index: 2;
+      max-width: 860px;
+      margin: 0;
+      color: #cbd3e6;
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    .preview-note {
+      position: relative;
+      z-index: 2;
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      color: #ffe9a6;
+      background: rgba(255, 209, 102, .08);
+      border: 1px solid rgba(255, 209, 102, .18);
+      line-height: 1.55;
+      font-size: 13px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+      position: relative;
+      z-index: 2;
+    }
+
+    button, select, input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      border-radius: 16px;
+      padding: 13px 16px;
+      cursor: pointer;
+      font-weight: 900;
+      transition: .18s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+    }
+
+    button:active {
+      transform: scale(.98);
+    }
+
+    button:disabled {
+      opacity: .48;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .primary {
+      background: #ffd166;
+      color: #17120a;
+      box-shadow: 0 10px 24px rgba(255,209,102,.18);
+    }
+
+    .secondary {
+      background: rgba(255,255,255,.10);
+      color: #f6f1e8;
+      border: 1px solid rgba(255,255,255,.16);
+    }
+
+    .danger {
+      background: rgba(255,107,107,.16);
+      color: #ffd3d3;
+      border: 1px solid rgba(255,107,107,.3);
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1.25fr .75fr .85fr .65fr auto;
+      gap: 10px;
+      margin: 22px 0;
+    }
+
+    .toolbar input,
+    .toolbar select {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 16px;
+      padding: 13px 14px;
+      color: #f6f1e8;
+      background: rgba(255,255,255,.07);
+      outline: none;
+    }
+
+    .toolbar option {
+      color: #111;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .case-panel,
+    .archive-panel {
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 28px;
+      background: rgba(255,255,255,.07);
+      box-shadow: 0 20px 46px rgba(0,0,0,.25);
+      overflow: hidden;
+    }
+
+    .case-head {
+      padding: 24px 22px 8px;
+    }
+
+    .case-title {
+      margin: 0;
+      font-size: 29px;
+      line-height: 1.2;
+      letter-spacing: -.6px;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 13px;
+    }
+
+    .tag {
+      font-size: 12px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      color: #dfe6ff;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    .difficulty {
+      color: #ffd166;
+      background: rgba(255,209,102,.12);
+      border-color: rgba(255,209,102,.28);
+    }
+
+    .case-body {
+      padding: 12px 22px 22px;
+    }
+
+    .intro {
+      margin: 8px 0 18px;
+      font-size: 17px;
+      line-height: 1.72;
+      color: #f3efe7;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .meta-card {
+      min-height: 78px;
+      border-radius: 18px;
+      padding: 13px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.1);
+    }
+
+    .meta-card small {
+      display: block;
+      color: #9fa8c7;
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+
+    .meta-card strong {
+      display: block;
+      color: #fff;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .stage-box {
+      margin-top: 18px;
+      border-radius: 24px;
+      border: 1px solid rgba(255,209,102,.27);
+      background: rgba(255,209,102,.07);
+      padding: 18px;
+    }
+
+    .stage-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .stage-label {
+      color: #ffd166;
+      font-weight: 900;
+    }
+
+    .stage-count {
+      font-size: 13px;
+      color: #9fa8c7;
+      font-weight: 800;
+    }
+
+    .clue-list {
+      display: grid;
+      gap: 10px;
+      margin: 0 0 14px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .clue-list li {
+      padding: 13px 14px;
+      border-radius: 16px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.09);
+      line-height: 1.62;
+      color: #f5eccd;
+    }
+
+    .question-card {
+      border-radius: 18px;
+      background: rgba(116,185,255,.10);
+      border: 1px solid rgba(116,185,255,.20);
+      padding: 15px 16px;
+      line-height: 1.62;
+      color: #dceeff;
+    }
+
+    .question-card b {
+      color: #9ed5ff;
+    }
+
+    .answer-card {
+      display: none;
+      margin-top: 12px;
+      border-radius: 18px;
+      background: rgba(149,213,178,.10);
+      border: 1px solid rgba(149,213,178,.24);
+      padding: 15px 16px;
+      line-height: 1.7;
+      color: #e4ffed;
+    }
+
+    .answer-card.show {
+      display: block;
+      animation: fadeIn .25s ease;
+    }
+
+    .final-card {
+      display: none;
+      margin-top: 14px;
+      border-radius: 20px;
+      background: rgba(255,209,102,.11);
+      border: 1px solid rgba(255,209,102,.32);
+      padding: 16px;
+      line-height: 1.7;
+      color: #fff3c4;
+    }
+
+    .final-card.show {
+      display: block;
+      animation: fadeIn .25s ease;
+    }
+
+    .final-card h3 {
+      margin: 0 0 8px;
+      color: #ffd166;
+    }
+
+    .case-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    a.source-link {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      border-radius: 16px;
+      padding: 13px 16px;
+      font-weight: 900;
+      color: #f6f1e8;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.16);
+      transition: .18s ease;
+    }
+
+    a.source-link:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255,209,102,.36);
+    }
+
+    .archive-panel {
+      padding: 18px;
+    }
+
+    .archive-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .archive-top h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .progress {
+      color: #ffd166;
+      font-weight: 900;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .case-list {
+      display: grid;
+      gap: 9px;
+      max-height: 760px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .case-item {
+      width: 100%;
+      text-align: left;
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(0,0,0,.16);
+      color: #f6f1e8;
+      border-radius: 18px;
+      padding: 12px 13px;
+      cursor: pointer;
+      transition: .15s ease;
+    }
+
+    .case-item:hover {
+      border-color: rgba(255,209,102,.35);
+      background: rgba(255,209,102,.07);
+    }
+
+    .case-item.active {
+      border-color: #ffd166;
+      background: rgba(255,209,102,.12);
+    }
+
+    .case-item.done::after {
+      content: "탐험 완료";
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 11px;
+      color: #10131f;
+      background: #95d5b2;
+      padding: 4px 7px;
+      border-radius: 999px;
+      font-weight: 900;
+    }
+
+    .case-item-title {
+      font-weight: 900;
+      margin-bottom: 5px;
+      line-height: 1.35;
+    }
+
+    .case-item-sub {
+      color: #9fa8c7;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .empty {
+      padding: 20px;
+      border-radius: 18px;
+      text-align: center;
+      color: #9fa8c7;
+      background: rgba(0,0,0,.16);
+      border: 1px solid rgba(255,255,255,.1);
+    }
+
+    footer {
+      margin-top: 22px;
+      color: #9fa8c7;
+      line-height: 1.6;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 860px) {
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .meta {
+        grid-template-columns: 1fr;
+      }
+
+      .case-title {
+        font-size: 24px;
+      }
+
+      header {
+        padding: 28px 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <header>
+      <div class="badge">🕯️ Mystery Archive Explorer</div>
+      <h1>미스터리 사건<br />탐험 아카이브</h1>
+      <p class="lead">
+        국내외 미스터리 사건 50개를 단계별로 탐험하는 사이트야.
+        단서 묶음을 보고 질문을 생각한 뒤, <strong>답변보기</strong>를 눌러 사건별 해설을 확인하고 다음 단계로 넘어가.
+      </p>
+      <div class="preview-note">
+        iPhone 파일 미리보기 화면에서는 JavaScript가 제한되어 버튼이 제대로 작동하지 않을 수 있어.
+        GitHub Pages 링크 또는 Safari/Chrome 브라우저에서 열면 탐험 기능이 정상 작동해.
+      </div>
+      <div class="controls">
+        <button class="primary" id="randomBtn">랜덤 탐험 시작</button>
+        <button class="secondary" id="nextCaseBtn">다음 사건</button>
+        <button class="secondary" id="resetProgressBtn">탐험 기록 초기화</button>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <input id="searchInput" placeholder="사건명, 지역, 키워드 검색" />
+      <select id="regionFilter"><option value="전체">전체 지역</option></select>
+      <select id="categoryFilter"><option value="전체">전체 분류</option></select>
+      <select id="difficultyFilter"><option value="전체">전체 난이도</option></select>
+      <button class="secondary" id="clearFilterBtn">필터 초기화</button>
+    </div>
+
+    <div class="main-grid">
+      <section class="case-panel">
+        <div class="case-head">
+          <h2 class="case-title" id="caseTitle">개구리소년 사건</h2>
+          <div class="tag-row" id="tagRow">
+              <span class="tag">국내</span>
+              <span class="tag">국내 미제·의문사</span>
+              <span class="tag difficulty">어려움</span>
+          </div>
+        </div>
+
+        <div class="case-body">
+          <p class="intro" id="caseIntro">와룡산 인근으로 나간 다섯 소년이 실종된 뒤 장기간 수색에도 행방이 확인되지 않았고, 이후 유골이 발견되며 한국의 대표 장기 미제사건으로 남았다.</p>
+
+          <div class="meta">
+            <div class="meta-card"><small>발생 시기</small><strong id="caseYear">1991</strong></div>
+            <div class="meta-card"><small>장소</small><strong id="casePlace">대구, 대한민국</strong></div>
+            <div class="meta-card"><small>현재 상태</small><strong id="caseStatus">미제</strong></div>
+          </div>
+
+          <div class="stage-box">
+            <div class="stage-top">
+              <div class="stage-label" id="stageLabel">1단계. 사건의 첫 장면</div>
+              <div class="stage-count" id="stageCount">1 / 4 단계</div>
+            </div>
+
+            <ul class="clue-list" id="clueList">
+              <li>단서 1. 와룡산 인근으로 나간 다섯 소년이 실종된 뒤 장기간 수색에도 행방이 확인되지 않았고, 이후 유골이 발견되며 한국의 대표 장기 미제사건으로 남았다.</li>
+              <li>단서 2. 사건 초기 명칭과 실제 목적지에 대한 혼선이 있었다.</li>
+            </ul>
+
+            <div class="question-card" id="questionCard"><b>질문.</b> 개구리소년 사건에서 처음 주목해야 할 지점은 무엇일까?</div>
+
+            <div class="answer-card" id="answerCard"><b>답변.</b> 아이들이 모두 함께 사라졌다는 점 때문에 단순 가출보다 외부 요인 가능성을 초반부터 강하게 봤어야 한다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야.</div>
+
+            <div class="final-card" id="finalCard">
+              <h3>그렇다면..</h3>
+              <div id="finalQuestion">장기 미제 사건에서 초동수사의 실수는 몇 년 뒤 과학수사로도 회복할 수 있을까?</div>
+            </div>
+          </div>
+
+          <div class="case-actions">
+            <button class="primary" id="answerBtn">답변보기</button>
+            <button class="secondary" id="nextStageBtn" disabled>다음 단계</button>
+            <button class="secondary" id="completeBtn">탐험 완료</button>
+            <a class="source-link" id="sourceLink" target="_blank" rel="noopener noreferrer" href="https://ko.wikipedia.org/wiki/%EA%B0%9C%EA%B5%AC%EB%A6%AC_%EC%86%8C%EB%85%84">자료 더 보기</a>
+          </div>
+        </div>
+      </section>
+
+      <aside class="archive-panel">
+        <div class="archive-top">
+          <h2>사건 목록</h2>
+          <div class="progress" id="progressText">0 / 50 완료 · 표시 50개</div>
+        </div>
+        <div class="case-list" id="caseList">
+          <button class="case-item active" data-index="0">
+            <div class="case-item-title">개구리소년 사건</div>
+            <div class="case-item-sub">1991 · 대구, 대한민국 · 국내 미제·의문사 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="1">
+            <div class="case-item-title">이형호 유괴 살해 사건</div>
+            <div class="case-item-sub">1991 · 서울, 대한민국 · 국내 미제·의문사 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="2">
+            <div class="case-item-title">대구 어린이 황산테러 사건</div>
+            <div class="case-item-sub">1999 · 대구, 대한민국 · 국내 미제·의문사 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="3">
+            <div class="case-item-title">장준하 의문사 사건</div>
+            <div class="case-item-sub">1975 · 포천, 대한민국 · 국내 미제·의문사 · 보통</div>
+          </button>
+          <button class="case-item" data-index="4">
+            <div class="case-item-title">최종길 교수 의문사 사건</div>
+            <div class="case-item-sub">1973 · 서울, 대한민국 · 국내 미제·의문사 · 보통</div>
+          </button>
+          <button class="case-item" data-index="5">
+            <div class="case-item-title">김훈 중위 사건</div>
+            <div class="case-item-sub">1998 · 판문점 공동경비구역 · 국내 미제·의문사 · 보통</div>
+          </button>
+          <button class="case-item" data-index="6">
+            <div class="case-item-title">신정동 연쇄살인사건</div>
+            <div class="case-item-sub">2005–2006 · 서울 양천구, 대한민국 · 국내 미제·의문사 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="7">
+            <div class="case-item-title">치과의사 모녀 살인 사건</div>
+            <div class="case-item-sub">1995 · 서울, 대한민국 · 국내 미제·의문사 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="8">
+            <div class="case-item-title">이춘재 연쇄살인 사건</div>
+            <div class="case-item-sub">1986–1991 · 경기 화성 일대, 대한민국 · 국내 미제·의문사 · 보통</div>
+          </button>
+          <button class="case-item" data-index="9">
+            <div class="case-item-title">정인숙 피살사건</div>
+            <div class="case-item-sub">1970 · 서울, 대한민국 · 국내 미제·의문사 · 보통</div>
+          </button>
+          <button class="case-item" data-index="10">
+            <div class="case-item-title">MH370 실종</div>
+            <div class="case-item-sub">2014 · 인도양 추정 · 항공·해양 실종 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="11">
+            <div class="case-item-title">아멜리아 이어하트 실종</div>
+            <div class="case-item-sub">1937 · 태평양 · 항공·해양 실종 · 보통</div>
+          </button>
+          <button class="case-item" data-index="12">
+            <div class="case-item-title">D. B. 쿠퍼 하이재킹</div>
+            <div class="case-item-sub">1971 · 미국 북서부 · 육상·산악 실종 · 보통</div>
+          </button>
+          <button class="case-item" data-index="13">
+            <div class="case-item-title">메리 셀레스트호</div>
+            <div class="case-item-sub">1872 · 대서양 · 항공·해양 실종 · 보통</div>
+          </button>
+          <button class="case-item" data-index="14">
+            <div class="case-item-title">로어노크 식민지 실종</div>
+            <div class="case-item-sub">1590 · 미국 노스캐롤라이나 · 육상·산악 실종 · 보통</div>
+          </button>
+          <button class="case-item" data-index="15">
+            <div class="case-item-title">플래넌 제도 등대지기 실종</div>
+            <div class="case-item-sub">1900 · 스코틀랜드 플래넌 제도 · 항공·해양 실종 · 보통</div>
+          </button>
+          <button class="case-item" data-index="16">
+            <div class="case-item-title">USS 사이클롭스 실종</div>
+            <div class="case-item-sub">1918 · 서대서양 · 항공·해양 실종 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="17">
+            <div class="case-item-title">SS 와라타호 실종</div>
+            <div class="case-item-sub">1909 · 남아프리카 인근 해역 · 항공·해양 실종 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="18">
+            <div class="case-item-title">디아틀로프 패스 사건</div>
+            <div class="case-item-sub">1959 · 우랄산맥, 러시아 · 육상·산악 실종 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="19">
+            <div class="case-item-title">유바 카운티 파이브</div>
+            <div class="case-item-sub">1978 · 미국 캘리포니아 · 육상·산악 실종 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="20">
+            <div class="case-item-title">소더 아이들 실종</div>
+            <div class="case-item-sub">1945 · 미국 웨스트버지니아 · 육상·산악 실종 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="21">
+            <div class="case-item-title">보몬트 남매 실종</div>
+            <div class="case-item-sub">1966 · 호주 애들레이드 · 육상·산악 실종 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="22">
+            <div class="case-item-title">매들린 매캔 실종</div>
+            <div class="case-item-sub">2007 · 포르투갈 프라이아 다 루스 · 육상·산악 실종 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="23">
+            <div class="case-item-title">모라 머레이 실종</div>
+            <div class="case-item-sub">2004 · 미국 뉴햄프셔 · 육상·산악 실종 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="24">
+            <div class="case-item-title">아샤 디그리 실종</div>
+            <div class="case-item-sub">2000 · 미국 노스캐롤라이나 · 육상·산악 실종 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="25">
+            <div class="case-item-title">퍼시 포셋 실종</div>
+            <div class="case-item-sub">1925 · 브라질 아마존 · 육상·산악 실종 · 보통</div>
+          </button>
+          <button class="case-item" data-index="26">
+            <div class="case-item-title">마이클 록펠러 실종</div>
+            <div class="case-item-sub">1961 · 뉴기니 · 육상·산악 실종 · 보통</div>
+          </button>
+          <button class="case-item" data-index="27">
+            <div class="case-item-title">지미 호파 실종</div>
+            <div class="case-item-sub">1975 · 미국 미시간 · 육상·산악 실종 · 보통</div>
+          </button>
+          <button class="case-item" data-index="28">
+            <div class="case-item-title">트레발린 에번스 실종</div>
+            <div class="case-item-sub">1990 · 웨일스 · 육상·산악 실종 · 보통</div>
+          </button>
+          <button class="case-item" data-index="29">
+            <div class="case-item-title">잭 더 리퍼</div>
+            <div class="case-item-sub">1888 · 영국 런던 · 해외 미제범죄 · 보통</div>
+          </button>
+          <button class="case-item" data-index="30">
+            <div class="case-item-title">조디악 킬러</div>
+            <div class="case-item-sub">1960년대 · 미국 캘리포니아 · 암호·문서·고고학 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="31">
+            <div class="case-item-title">블랙 달리아 사건</div>
+            <div class="case-item-sub">1947 · 미국 로스앤젤레스 · 해외 미제범죄 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="32">
+            <div class="case-item-title">힌터카이펙 사건</div>
+            <div class="case-item-sub">1922 · 독일 바이에른 · 해외 미제범죄 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="33">
+            <div class="case-item-title">이스달 여인</div>
+            <div class="case-item-sub">1970 · 노르웨이 베르겐 · 해외 미제범죄 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="34">
+            <div class="case-item-title">소머턴 맨</div>
+            <div class="case-item-sub">1948 · 호주 애들레이드 · 암호·문서·고고학 · 보통</div>
+          </button>
+          <button class="case-item" data-index="35">
+            <div class="case-item-title">박스 속 소년 사건</div>
+            <div class="case-item-sub">1957 · 미국 필라델피아 · 해외 미제범죄 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="36">
+            <div class="case-item-title">클리블랜드 토르소 사건</div>
+            <div class="case-item-sub">1930년대 · 미국 클리블랜드 · 해외 미제범죄 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="37">
+            <div class="case-item-title">리드 마스크 사건</div>
+            <div class="case-item-sub">1966 · 브라질 리우데자네이루 · 해외 미제범죄 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="38">
+            <div class="case-item-title">위치 엘름의 벨라</div>
+            <div class="case-item-sub">1943 · 영국 우스터셔 · 해외 미제범죄 · 보통</div>
+          </button>
+          <button class="case-item" data-index="39">
+            <div class="case-item-title">서클빌 편지 사건</div>
+            <div class="case-item-sub">1970년대 · 미국 오하이오 · 암호·문서·고고학 · 보통</div>
+          </button>
+          <button class="case-item" data-index="40">
+            <div class="case-item-title">텍사카나 문라이트 사건</div>
+            <div class="case-item-sub">1946 · 미국 텍사스·아칸소 접경 · 해외 미제범죄 · 보통</div>
+          </button>
+          <button class="case-item" data-index="41">
+            <div class="case-item-title">빌리스카 사건</div>
+            <div class="case-item-sub">1912 · 미국 아이오와 · 해외 미제범죄 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="42">
+            <div class="case-item-title">보이니치 필사본</div>
+            <div class="case-item-sub">15세기 추정 · 예일대 소장 · 암호·문서·고고학 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="43">
+            <div class="case-item-title">크립토스 조각</div>
+            <div class="case-item-sub">1990 · 미국 CIA 본부 · 암호·문서·고고학 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="44">
+            <div class="case-item-title">시카다 3301</div>
+            <div class="case-item-sub">2012 · 인터넷 · 자연·괴현상·인터넷 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="45">
+            <div class="case-item-title">와우! 신호</div>
+            <div class="case-item-sub">1977 · 우주 전파 관측 · 자연·괴현상·인터넷 · 보통</div>
+          </button>
+          <button class="case-item" data-index="46">
+            <div class="case-item-title">맥스 헤드룸 방송 침입</div>
+            <div class="case-item-sub">1987 · 미국 시카고 · 자연·괴현상·인터넷 · 보통</div>
+          </button>
+          <button class="case-item" data-index="47">
+            <div class="case-item-title">오크 아일랜드 미스터리</div>
+            <div class="case-item-sub">1795년경부터 · 캐나다 노바스코샤 · 자연·괴현상·인터넷 · 보통</div>
+          </button>
+          <button class="case-item" data-index="48">
+            <div class="case-item-title">파이스토스 원반</div>
+            <div class="case-item-sub">기원전 2천년대 추정 · 크레타 · 암호·문서·고고학 · 어려움</div>
+          </button>
+          <button class="case-item" data-index="49">
+            <div class="case-item-title">슈그버러 비문</div>
+            <div class="case-item-sub">18세기 · 영국 스태퍼드셔 · 암호·문서·고고학 · 보통</div>
+          </button>
+        </div>
+      </aside>
+    </div>
+
+    <footer>
+      공개 자료 기반의 교육·엔터테인먼트용 요약 아카이브입니다.
+      실제 사건 피해자를 존중하기 위해 자극적 묘사는 줄이고, 사건의 구조와 단서 중심으로 구성했습니다.
+    </footer>
+  </div>
+
+  <script>
+    const cases = [
+    {
+        "title": "개구리소년 사건",
+        "region": "국내",
+        "place": "대구, 대한민국",
+        "year": "1991",
+        "category": "국내 미제·의문사",
+        "status": "미제",
+        "difficulty": "어려움",
+        "intro": "와룡산 인근으로 나간 다섯 소년이 실종된 뒤 장기간 수색에도 행방이 확인되지 않았고, 이후 유골이 발견되며 한국의 대표 장기 미제사건으로 남았다.",
+        "source": "https://ko.wikipedia.org/wiki/%EA%B0%9C%EA%B5%AC%EB%A6%AC_%EC%86%8C%EB%85%84",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "와룡산 인근으로 나간 다섯 소년이 실종된 뒤 장기간 수색에도 행방이 확인되지 않았고, 이후 유골이 발견되며 한국의 대표 장기 미제사건으로 남았다.",
+                    "사건 초기 명칭과 실제 목적지에 대한 혼선이 있었다."
+                ],
+                "question": "개구리소년 사건에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "아이들이 모두 함께 사라졌다는 점 때문에 단순 가출보다 외부 요인 가능성을 초반부터 강하게 봤어야 한다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "유골 발견 뒤에도 범인과 정확한 경위는 확정되지 않았다.",
+                    "11년 뒤 유골이 발견되면서 사망 사실은 확인됐지만, 현장·목격·이동 경로가 이미 크게 사라진 상태였다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "11년 뒤 유골이 발견되면서 사망 사실은 확인됐지만, 현장·목격·이동 경로가 이미 크게 사라진 상태였다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "실종 당일 아이들이 누구를 만났는지, 실제 범행 장소가 유골 발견지였는지, 범인이 아이들과 어떤 접점이 있었는지가 비어 있다.",
+                    "초기 현장 보존과 수사 방향이 달랐다면 무엇이 달라졌을까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "실종 당일 아이들이 누구를 만났는지, 실제 범행 장소가 유골 발견지였는지, 범인이 아이들과 어떤 접점이 있었는지가 비어 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘미제’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "실종 당일 아이들이 누구를 만났는지, 실제 범행 장소가 유골 발견지였는지, 범인이 아이들과 어떤 접점이 있었는지가 비어 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 실종 당일 아이들이 누구를 만났는지, 실제 범행 장소가 유골 발견지였는지, 범인이 아이들과 어떤 접점이 있었는지가 비어 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 장기 미제 사건에서 초동수사의 실수는 몇 년 뒤 과학수사로도 회복할 수 있을까?"
+    },
+    {
+        "title": "이형호 유괴 살해 사건",
+        "region": "국내",
+        "place": "서울, 대한민국",
+        "year": "1991",
+        "category": "국내 미제·의문사",
+        "status": "미제",
+        "difficulty": "어려움",
+        "intro": "서울 압구정동에서 발생한 아동 유괴 사건으로, 범인의 전화 음성이 남았지만 끝내 검거되지 못했다.",
+        "source": "https://ko.wikipedia.org/wiki/%EC%9D%B4%ED%98%95%ED%98%B8_%EC%9C%A0%EA%B4%B4_%EC%82%B4%ED%95%B4_%EC%82%AC%EA%B1%B4",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "서울 압구정동에서 발생한 아동 유괴 사건으로, 범인의 전화 음성이 남았지만 끝내 검거되지 못했다.",
+                    "범인은 여러 차례 금전 요구 전화를 했다."
+                ],
+                "question": "이형호 유괴 살해 사건에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "범인의 목소리가 남았다는 점이 강렬하지만, 목소리만으로 신원을 특정하려면 비교 대상과 통신 추적이 필요했다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "사건은 영화와 방송을 통해 널리 알려졌다.",
+                    "범인의 전화는 단서이면서 동시에 가족과 수사기관을 끌고 다니는 심리전 도구였다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "범인의 전화는 단서이면서 동시에 가족과 수사기관을 끌고 다니는 심리전 도구였다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "범인이 피해자를 언제까지 생존 상태로 두었는지, 금전 요구가 실제 목적이었는지 수사 지연 전략이었는지가 명확하지 않다.",
+                    "목소리라는 단서는 왜 범인 특정으로 이어지기 어려웠을까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "범인이 피해자를 언제까지 생존 상태로 두었는지, 금전 요구가 실제 목적이었는지 수사 지연 전략이었는지가 명확하지 않다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘미제’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "범인이 피해자를 언제까지 생존 상태로 두었는지, 금전 요구가 실제 목적이었는지 수사 지연 전략이었는지가 명확하지 않다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 범인이 피해자를 언제까지 생존 상태로 두었는지, 금전 요구가 실제 목적이었는지 수사 지연 전략이었는지가 명확하지 않다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 목소리처럼 인상적인 단서가 있어도 신원 특정으로 이어지지 않는다면, 그 단서는 얼마나 강한 증거일까?"
+    },
+    {
+        "title": "대구 어린이 황산테러 사건",
+        "region": "국내",
+        "place": "대구, 대한민국",
+        "year": "1999",
+        "category": "국내 미제·의문사",
+        "status": "미제",
+        "difficulty": "어려움",
+        "intro": "어린 피해자가 공격을 당한 뒤 사망했지만 범인이 특정되지 못했고, 이후 공소시효 논의의 상징적 사건이 되었다.",
+        "source": "https://ko.wikipedia.org/wiki/%EB%8C%80%EA%B5%AC_%EC%95%84%EB%8F%99_%ED%99%A9%EC%82%B0%ED%85%8C%EB%9F%AC_%EC%82%AC%EA%B1%B4",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "어린 피해자가 공격을 당한 뒤 사망했지만 범인이 특정되지 못했고, 이후 공소시효 논의의 상징적 사건이 되었다.",
+                    "사건은 살인죄 공소시효 폐지 논의와 연결되었다."
+                ],
+                "question": "대구 어린이 황산테러 사건에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "피해자가 남긴 말과 주변 정황은 중요했지만, 법적으로 한 사람을 범인으로 확정할 만큼 단단한 물증이 부족했다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "법 개정 이후에도 사건 자체는 소급 적용의 한계가 있었다.",
+                    "이 사건은 범인을 찾지 못한 채 시간이 흘러 공소시효 문제와 맞물렸고, 결국 법 개정 논의의 상징이 되었다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "이 사건은 범인을 찾지 못한 채 시간이 흘러 공소시효 문제와 맞물렸고, 결국 법 개정 논의의 상징이 되었다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "공격자가 피해자를 알고 있었는지, 동기가 무엇이었는지, 사전에 준비된 범행이었는지에 대한 핵심이 남아 있다.",
+                    "장기 미제사건에서 공소시효 제도는 어떻게 설계되어야 할까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "공격자가 피해자를 알고 있었는지, 동기가 무엇이었는지, 사전에 준비된 범행이었는지에 대한 핵심이 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘미제’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "공격자가 피해자를 알고 있었는지, 동기가 무엇이었는지, 사전에 준비된 범행이었는지에 대한 핵심이 남아 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 공격자가 피해자를 알고 있었는지, 동기가 무엇이었는지, 사전에 준비된 범행이었는지에 대한 핵심이 남아 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 공소시효가 사라진다고 해도 오래된 사건을 실제로 해결하려면 무엇이 가장 필요할까?"
+    },
+    {
+        "title": "장준하 의문사 사건",
+        "region": "국내",
+        "place": "포천, 대한민국",
+        "year": "1975",
+        "category": "국내 미제·의문사",
+        "status": "논쟁",
+        "difficulty": "보통",
+        "intro": "언론인·정치인 장준하가 산행 중 사망한 사건으로, 실족사 발표 이후에도 정치적 배경과 함께 의문이 제기되어 왔다.",
+        "source": "https://ko.wikipedia.org/wiki/%EC%9E%A5%EC%A4%80%ED%95%98",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "언론인·정치인 장준하가 산행 중 사망한 사건으로, 실족사 발표 이후에도 정치적 배경과 함께 의문이 제기되어 왔다.",
+                    "사망 당시의 시대적 배경 때문에 의혹이 커졌다."
+                ],
+                "question": "장준하 의문사 사건에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "정치적 반대 활동을 하던 인물이 권위주의 시기에 산행 중 사망했기 때문에, 단순 실족사 발표만으로 의혹이 해소되지 않았다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "이후 여러 차례 재조사와 사회적 논의가 이어졌다.",
+                    "사망 당시 현장 기록과 감식 자료가 충분하지 않아, 훗날 재조사를 해도 부상 양상과 경위를 완전히 복원하기 어려웠다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "사망 당시 현장 기록과 감식 자료가 충분하지 않아, 훗날 재조사를 해도 부상 양상과 경위를 완전히 복원하기 어려웠다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "추락만으로 설명되는 부상인지, 동행자 진술과 권력기관 관련 정황이 충분히 검증되었는지가 남아 있다.",
+                    "정치적 사건에서 공식 발표와 사회적 의혹은 어떻게 검증되어야 할까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "추락만으로 설명되는 부상인지, 동행자 진술과 권력기관 관련 정황이 충분히 검증되었는지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 정치적 맥락이 강한 사건에서 공식 기록과 사회적 의혹 중 무엇을 먼저 검증해야 할까?"
+    },
+    {
+        "title": "최종길 교수 의문사 사건",
+        "region": "국내",
+        "place": "서울, 대한민국",
+        "year": "1973",
+        "category": "국내 미제·의문사",
+        "status": "진상규명",
+        "difficulty": "보통",
+        "intro": "서울대 법대 교수 최종길이 중앙정보부 조사 중 사망한 사건으로, 이후 국가권력과 인권 문제의 상징적 사건이 되었다.",
+        "source": "https://ko.wikipedia.org/wiki/%EC%B5%9C%EC%A2%85%EA%B8%B8",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "서울대 법대 교수 최종길이 중앙정보부 조사 중 사망한 사건으로, 이후 국가권력과 인권 문제의 상징적 사건이 되었다.",
+                    "초기 발표와 이후 조사 결과 사이에 큰 차이가 있었다."
+                ],
+                "question": "최종길 교수 의문사 사건에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "국가기관 조사 중 사망했다는 점 자체가 핵심이다. 통제된 공간에서 벌어진 사망은 기관이 더 높은 설명 책임을 져야 한다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "과거사 조사와 국가배상 논의에서 중요하게 다뤄졌다.",
+                    "초기 발표와 이후 과거사 판단 사이의 차이는 당시 기록과 수사 결과를 그대로 믿기 어렵다는 문제를 드러냈다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "초기 발표와 이후 과거사 판단 사이의 차이는 당시 기록과 수사 결과를 그대로 믿기 어렵다는 문제를 드러냈다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "조사실 내부에서 실제 어떤 압박과 폭력이 있었는지, 책임이 어느 선까지 이어지는지는 완전히 복원되기 어렵다.",
+                    "국가기관이 관여한 사건의 기록은 어떻게 검증해야 할까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "조사실 내부에서 실제 어떤 압박과 폭력이 있었는지, 책임이 어느 선까지 이어지는지는 완전히 복원되기 어렵다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 국가기관 내부에서 발생한 사건은 시간이 지난 뒤에도 어떤 방식으로 책임을 물을 수 있을까?"
+    },
+    {
+        "title": "김훈 중위 사건",
+        "region": "국내",
+        "place": "판문점 공동경비구역",
+        "year": "1998",
+        "category": "국내 미제·의문사",
+        "status": "논쟁",
+        "difficulty": "보통",
+        "intro": "판문점 공동경비구역에서 김훈 중위가 사망한 사건으로, 자살 여부와 타살 가능성을 둘러싼 논쟁이 이어졌다.",
+        "source": "https://ko.wikipedia.org/wiki/%EA%B9%80%ED%9B%88_%EC%A4%91%EC%9C%84_%EC%82%AC%EA%B1%B4",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "판문점 공동경비구역에서 김훈 중위가 사망한 사건으로, 자살 여부와 타살 가능성을 둘러싼 논쟁이 이어졌다.",
+                    "현장 상황과 총기 사용 방식에 대한 의문이 제기되었다."
+                ],
+                "question": "김훈 중위 사건에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "총기 사망 사건은 총기 위치, 탄도, 자세가 서로 맞아야 하는데 이 사건은 그 해석을 둘러싼 의문이 오래갔다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "군 내부 수사의 투명성 문제가 함께 논의되었다.",
+                    "판문점 공동경비구역이라는 특수하고 폐쇄적인 공간 때문에 외부 검증이 늦고 제한적이었다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "판문점 공동경비구역이라는 특수하고 폐쇄적인 공간 때문에 외부 검증이 늦고 제한적이었다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "공식 결론과 현장 물리 증거가 완전히 맞물리는지, 군 내부 조사가 독립적으로 이루어졌는지가 남아 있다.",
+                    "폐쇄적 조직에서 발생한 사건은 어떻게 외부 검증을 받아야 할까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "공식 결론과 현장 물리 증거가 완전히 맞물리는지, 군 내부 조사가 독립적으로 이루어졌는지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 폐쇄적 조직의 내부 조사 결과를 신뢰하려면 최소한 어떤 정보가 공개되어야 할까?"
+    },
+    {
+        "title": "신정동 연쇄살인사건",
+        "region": "국내",
+        "place": "서울 양천구, 대한민국",
+        "year": "2005–2006",
+        "category": "국내 미제·의문사",
+        "status": "미제",
+        "difficulty": "어려움",
+        "intro": "서울 신정동 일대에서 발생한 연쇄 강력사건으로, 일부 피해자는 탈출했으나 범인은 특정되지 않았다.",
+        "source": "https://ko.wikipedia.org/wiki/%EC%8B%A0%EC%A0%95%EB%8F%99_%EC%97%B0%EC%87%84%EC%82%B4%EC%9D%B8%EC%82%AC%EA%B1%B4",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "서울 신정동 일대에서 발생한 연쇄 강력사건으로, 일부 피해자는 탈출했으나 범인은 특정되지 않았다.",
+                    "생존자의 증언이 사건의 중요한 단서가 되었다."
+                ],
+                "question": "신정동 연쇄살인사건에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "생존자의 증언은 감금 공간과 범인의 행동을 알려주는 거의 유일한 직접 단서였다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "현장 구조와 범인의 행동 패턴이 주목받았다.",
+                    "증언은 범행 패턴을 보여주지만, 범인의 이름·주소·정확한 거처로 바로 연결되지는 못했다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "증언은 범행 패턴을 보여주지만, 범인의 이름·주소·정확한 거처로 바로 연결되지는 못했다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "범인이 단독범인지 공범이 있었는지, 감금 장소가 정확히 어디였는지, 사건들이 같은 범인의 소행인지가 남아 있다.",
+                    "생존자 진술은 장기 미제사건에서 어떤 역할을 할까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "범인이 단독범인지 공범이 있었는지, 감금 장소가 정확히 어디였는지, 사건들이 같은 범인의 소행인지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘미제’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "범인이 단독범인지 공범이 있었는지, 감금 장소가 정확히 어디였는지, 사건들이 같은 범인의 소행인지가 남아 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 범인이 단독범인지 공범이 있었는지, 감금 장소가 정확히 어디였는지, 사건들이 같은 범인의 소행인지가 남아 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 피해자의 기억이 유일한 단서일 때, 우리는 그 기억을 어디까지 믿고 어떻게 보완해야 할까?"
+    },
+    {
+        "title": "치과의사 모녀 살인 사건",
+        "region": "국내",
+        "place": "서울, 대한민국",
+        "year": "1995",
+        "category": "국내 미제·의문사",
+        "status": "논쟁",
+        "difficulty": "어려움",
+        "intro": "치과의사와 딸이 사망한 사건으로, 재판과 증거 판단을 둘러싼 논란이 오래 지속되었다.",
+        "source": "https://ko.wikipedia.org/wiki/%EC%B9%98%EA%B3%BC%EC%9D%98%EC%82%AC_%EB%AA%A8%EB%85%80_%EC%82%B4%EC%9D%B8_%EC%82%AC%EA%B1%B4",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "치과의사와 딸이 사망한 사건으로, 재판과 증거 판단을 둘러싼 논란이 오래 지속되었다.",
+                    "화재와 사망 원인, 시간대 판단이 쟁점이었다."
+                ],
+                "question": "치과의사 모녀 살인 사건에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "화재가 함께 있는 사건은 사망 시점, 화재 시점, 현장 흔적이 서로 뒤섞여 해석이 매우 어려워진다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "법정에서 증거의 해석이 크게 다투어졌다.",
+                    "직접 목격자보다 법의학과 화재감식에 의존했기 때문에 같은 증거를 두고 법정 판단이 흔들릴 수 있었다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "직접 목격자보다 법의학과 화재감식에 의존했기 때문에 같은 증거를 두고 법정 판단이 흔들릴 수 있었다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "정황증거들이 하나의 그림을 만드는지, 아니면 다른 가능성을 배제하지 못하는지가 핵심으로 남았다.",
+                    "정황증거만으로 사건의 전체 그림을 얼마나 확정할 수 있을까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "정황증거들이 하나의 그림을 만드는지, 아니면 다른 가능성을 배제하지 못하는지가 핵심으로 남았다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘논쟁’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "정황증거들이 하나의 그림을 만드는지, 아니면 다른 가능성을 배제하지 못하는지가 핵심으로 남았다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 정황증거들이 하나의 그림을 만드는지, 아니면 다른 가능성을 배제하지 못하는지가 핵심으로 남았다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 정황증거가 강하게 의심을 만들지만 직접증거가 부족할 때 법은 어디까지 판단해야 할까?"
+    },
+    {
+        "title": "이춘재 연쇄살인 사건",
+        "region": "국내",
+        "place": "경기 화성 일대, 대한민국",
+        "year": "1986–1991",
+        "category": "국내 미제·의문사",
+        "status": "범인 확인",
+        "difficulty": "보통",
+        "intro": "오랫동안 한국의 대표 미제사건으로 남았다가 DNA 분석과 자백으로 뒤늦게 실체가 드러난 사건.",
+        "source": "https://ko.wikipedia.org/wiki/%EC%9D%B4%EC%B6%98%EC%9E%AC_%EC%97%B0%EC%87%84_%EC%82%B4%EC%9D%B8_%EC%82%AC%EA%B1%B4",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "오랫동안 한국의 대표 미제사건으로 남았다가 DNA 분석과 자백으로 뒤늦게 실체가 드러난 사건.",
+                    "과학수사 기술 발전이 과거 사건을 다시 여는 계기가 되었다."
+                ],
+                "question": "이춘재 연쇄살인 사건에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "뒤늦은 해결의 핵심은 오래 보관된 증거를 DNA 기술로 다시 읽을 수 있게 된 점이다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "공소시효 문제로 처벌 가능성에는 한계가 있었다.",
+                    "진범 확인은 큰 성과였지만 공소시효와 과거 오판 문제 때문에 정의가 완전히 실현되었다고 말하기 어려웠다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "진범 확인은 큰 성과였지만 공소시효와 과거 오판 문제 때문에 정의가 완전히 실현되었다고 말하기 어려웠다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "피해자 회복, 억울한 수사 피해자 문제, 과거 수사 책임이 각각 별개의 과제로 남았다.",
+                    "과학수사는 과거 사건을 어디까지 다시 열 수 있을까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "피해자 회복, 억울한 수사 피해자 문제, 과거 수사 책임이 각각 별개의 과제로 남았다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 범인을 뒤늦게 알아냈지만 처벌할 수 없다면 사회는 어떤 방식으로 피해자에게 답해야 할까?"
+    },
+    {
+        "title": "정인숙 피살사건",
+        "region": "국내",
+        "place": "서울, 대한민국",
+        "year": "1970",
+        "category": "국내 미제·의문사",
+        "status": "논쟁",
+        "difficulty": "보통",
+        "intro": "1970년대 한국 사회에서 정치권 루머와 함께 큰 파장을 일으킨 피살 사건.",
+        "source": "https://ko.wikipedia.org/wiki/%EC%A0%95%EC%9D%B8%EC%88%99_%ED%94%BC%EC%82%B4%EC%82%AC%EA%B1%B4",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "1970년대 한국 사회에서 정치권 루머와 함께 큰 파장을 일으킨 피살 사건.",
+                    "사건은 당시 권력층 관련 의혹과 함께 보도되었다."
+                ],
+                "question": "정인숙 피살사건에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "피살 사건 자체보다 당시 권력층 관련 소문이 더 크게 소비되면서 사건의 중심이 흐려졌다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "사실관계와 소문이 뒤섞이며 오랫동안 논쟁이 이어졌다.",
+                    "정치적 스캔들과 범죄 수사가 뒤섞이자 검증된 사실과 풍문이 분리되지 못했다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "정치적 스캔들과 범죄 수사가 뒤섞이자 검증된 사실과 풍문이 분리되지 못했다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "범행 동기와 배후 의혹이 어디까지 사실인지, 어디부터 정치적 소문인지가 남아 있다.",
+                    "정치적 소문은 사건의 진실 규명을 어떻게 흐릴 수 있을까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "범행 동기와 배후 의혹이 어디까지 사실인지, 어디부터 정치적 소문인지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 정치적 소문이 강한 사건에서 우리는 무엇을 사실로 받아들이고 무엇을 보류해야 할까?"
+    },
+    {
+        "title": "MH370 실종",
+        "region": "해외",
+        "place": "인도양 추정",
+        "year": "2014",
+        "category": "항공·해양 실종",
+        "status": "미확정",
+        "difficulty": "어려움",
+        "intro": "쿠알라룸푸르에서 베이징으로 향하던 여객기가 239명을 태운 채 사라진 현대 항공사 최대 미스터리 중 하나.",
+        "source": "https://en.wikipedia.org/wiki/Malaysia_Airlines_Flight_370",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "쿠알라룸푸르에서 베이징으로 향하던 여객기가 239명을 태운 채 사라진 현대 항공사 최대 미스터리 중 하나.",
+                    "위성 통신 분석은 남인도양 방향 항로 가능성을 제시했다."
+                ],
+                "question": "MH370 실종에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "민간 관제에서 사라진 뒤 위성 통신과 군 레이더 같은 간접 신호로만 항로를 추정해야 했다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "일부 잔해가 발견되었지만 핵심 동체와 블랙박스는 확인되지 않았다.",
+                    "잔해 일부는 추락 가능성을 보여주지만, 블랙박스와 동체가 없으면 조종실 상황과 원인을 확정할 수 없다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "잔해 일부는 추락 가능성을 보여주지만, 블랙박스와 동체가 없으면 조종실 상황과 원인을 확정할 수 없다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "항로 변경이 기계 문제였는지, 조종실 내부의 의도적 행동이었는지, 마지막 순간 무슨 일이 있었는지가 남아 있다.",
+                    "첨단 추적 시스템이 있는 시대에도 거대한 항공기가 사라질 수 있었던 이유는 무엇일까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "항로 변경이 기계 문제였는지, 조종실 내부의 의도적 행동이었는지, 마지막 순간 무슨 일이 있었는지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘미확정’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "항로 변경이 기계 문제였는지, 조종실 내부의 의도적 행동이었는지, 마지막 순간 무슨 일이 있었는지가 남아 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 항로 변경이 기계 문제였는지, 조종실 내부의 의도적 행동이었는지, 마지막 순간 무슨 일이 있었는지가 남아 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 모든 비행기를 완전 실시간 추적해야 한다면 안전과 비용·개인정보 사이의 균형은 어떻게 잡아야 할까?"
+    },
+    {
+        "title": "아멜리아 이어하트 실종",
+        "region": "해외",
+        "place": "태평양",
+        "year": "1937",
+        "category": "항공·해양 실종",
+        "status": "미확정",
+        "difficulty": "보통",
+        "intro": "세계 일주 비행에 도전하던 비행사 아멜리아 이어하트와 항법사 프레드 누난이 태평양 상공에서 실종된 사건.",
+        "source": "https://en.wikipedia.org/wiki/Amelia_Earhart",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "세계 일주 비행에 도전하던 비행사 아멜리아 이어하트와 항법사 프레드 누난이 태평양 상공에서 실종된 사건.",
+                    "마지막 교신, 연료, 항로 오차가 핵심 단서로 남았다."
+                ],
+                "question": "아멜리아 이어하트 실종에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "작은 하울랜드섬을 GPS 없이 찾는 일은 당시 기술로 매우 어려웠고, 항법 오차가 누적되면 곧바로 연료 문제로 이어졌다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "니쿠마로로섬 표류설 등 다양한 가설이 있다.",
+                    "해상 추락설이 가장 단순하지만 기체와 유해가 발견되지 않아 니쿠마로로섬 표류설 같은 대안이 계속 살아남았다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "해상 추락설이 가장 단순하지만 기체와 유해가 발견되지 않아 니쿠마로로섬 표류설 같은 대안이 계속 살아남았다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "마지막 교신 이후 이어하트와 누난이 바다에 추락했는지, 섬에 불시착했는지, 얼마나 생존했는지가 남아 있다.",
+                    "바다 위 실종 사건에서 마지막 교신은 얼마나 결정적인 단서일까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "마지막 교신 이후 이어하트와 누난이 바다에 추락했는지, 섬에 불시착했는지, 얼마나 생존했는지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 유명 인물의 실종은 왜 단순 사고보다 더 오래 미스터리로 남을까?"
+    },
+    {
+        "title": "D. B. 쿠퍼 하이재킹",
+        "region": "해외",
+        "place": "미국 북서부",
+        "year": "1971",
+        "category": "육상·산악 실종",
+        "status": "미제",
+        "difficulty": "보통",
+        "intro": "항공기를 납치해 몸값을 받은 뒤 낙하산으로 뛰어내려 사라진 정체불명의 인물에 관한 사건.",
+        "source": "https://www.fbi.gov/history/famous-cases/db-cooper-hijacking",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "항공기를 납치해 몸값을 받은 뒤 낙하산으로 뛰어내려 사라진 정체불명의 인물에 관한 사건.",
+                    "일부 돈뭉치가 훗날 발견되었다."
+                ],
+                "question": "D. B. 쿠퍼 하이재킹에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "항공기 납치와 낙하산 탈출은 치밀해 보였지만, 야간 악천후 속 낙하는 생존 자체가 불확실한 선택이었다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "범인의 생존 여부와 정체는 확인되지 않았다.",
+                    "강가에서 발견된 돈뭉치는 쿠퍼의 실제 이동 경로를 보여주는 듯하지만, 사망·분실·이동 중 어느 쪽인지 해석이 갈린다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "강가에서 발견된 돈뭉치는 쿠퍼의 실제 이동 경로를 보여주는 듯하지만, 사망·분실·이동 중 어느 쪽인지 해석이 갈린다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "쿠퍼가 착지 후 살아남았는지, 살아남았다면 왜 몸값을 거의 사용하지 않았는지가 남아 있다.",
+                    "범인이 살아남았다면 왜 돈의 흔적이 거의 남지 않았을까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "쿠퍼가 착지 후 살아남았는지, 살아남았다면 왜 몸값을 거의 사용하지 않았는지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 범인이 사라진 사건에서 “증거가 없다는 것”은 생존의 증거일까, 사망의 증거일까?"
+    },
+    {
+        "title": "메리 셀레스트호",
+        "region": "해외",
+        "place": "대서양",
+        "year": "1872",
+        "category": "항공·해양 실종",
+        "status": "미확정",
+        "difficulty": "보통",
+        "intro": "멀쩡한 상태로 발견된 배에서 선장과 승무원, 가족이 모두 사라져 있었던 고전 해양 미스터리.",
+        "source": "https://www.smithsonianmag.com/history/abandoned-ship-the-mary-celeste-174488104/",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "멀쩡한 상태로 발견된 배에서 선장과 승무원, 가족이 모두 사라져 있었던 고전 해양 미스터리.",
+                    "구명정은 사라졌고 큰 전투 흔적은 없었다고 알려져 있다."
+                ],
+                "question": "메리 셀레스트호에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "배는 큰 파손 없이 발견되었지만 사람만 사라져 있었기 때문에, “왜 멀쩡한 배를 버렸는가”가 핵심이 되었다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "알코올 증기, 항해 판단 착오, 악천후 등 현실적 설명도 있다.",
+                    "구명정이 사라진 점은 승무원들이 스스로 배를 떠났을 가능성을 보여주지만, 무엇이 그 결정을 촉발했는지는 불확실하다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "구명정이 사라진 점은 승무원들이 스스로 배를 떠났을 가능성을 보여주지만, 무엇이 그 결정을 촉발했는지는 불확실하다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "알코올 증기, 펌프 이상, 악천후, 항해 판단 착오 중 무엇이 실제 공포를 만들었는지가 남아 있다.",
+                    "사람들이 배를 버리게 만든 가장 현실적인 공포는 무엇이었을까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "알코올 증기, 펌프 이상, 악천후, 항해 판단 착오 중 무엇이 실제 공포를 만들었는지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 위험을 실제보다 크게 느낀 순간의 판단도 사고 원인으로 볼 수 있을까?"
+    },
+    {
+        "title": "로어노크 식민지 실종",
+        "region": "해외",
+        "place": "미국 노스캐롤라이나",
+        "year": "1590",
+        "category": "육상·산악 실종",
+        "status": "미확정",
+        "difficulty": "보통",
+        "intro": "영국 식민지 개척민들이 사라지고 CROATOAN이라는 글자만 남아 있었다는 이야기로 유명한 사건.",
+        "source": "https://en.wikipedia.org/wiki/Roanoke_Colony",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "영국 식민지 개척민들이 사라지고 CROATOAN이라는 글자만 남아 있었다는 이야기로 유명한 사건.",
+                    "인근 원주민 집단과 합류했을 가능성이 제기된다."
+                ],
+                "question": "로어노크 식민지 실종에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "식민지에 남은 “CROATOAN” 표식은 집단이 근처로 이동했을 가능성을 보여주지만, 최종 운명은 말해주지 않는다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "기록 부족 때문에 기아, 질병, 이동, 충돌설이 공존한다.",
+                    "보급 지연과 기록 부족 때문에 실종이 학살인지, 기아와 이동인지, 원주민 사회와의 합류인지 구분하기 어렵다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "보급 지연과 기록 부족 때문에 실종이 학살인지, 기아와 이동인지, 원주민 사회와의 합류인지 구분하기 어렵다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "개척민들이 어디로 갔는지, 현지 집단과 어떻게 관계를 맺었는지, 유해와 물증이 왜 부족한지가 남아 있다.",
+                    "기록이 부족한 사건에서 역사학자는 어떻게 가능성을 좁힐까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "개척민들이 어디로 갔는지, 현지 집단과 어떻게 관계를 맺었는지, 유해와 물증이 왜 부족한지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 기록이 부족한 역사 사건에서 가장 합리적인 설명은 어떻게 골라야 할까?"
+    },
+    {
+        "title": "플래넌 제도 등대지기 실종",
+        "region": "해외",
+        "place": "스코틀랜드 플래넌 제도",
+        "year": "1900",
+        "category": "항공·해양 실종",
+        "status": "미확정",
+        "difficulty": "보통",
+        "intro": "외딴 등대에서 근무하던 세 명의 등대지기가 갑자기 사라진 사건.",
+        "source": "https://en.wikipedia.org/wiki/Flannan_Isles_Lighthouse",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "외딴 등대에서 근무하던 세 명의 등대지기가 갑자기 사라진 사건.",
+                    "등대는 비어 있었고 거센 파도와 장비 손상 가능성이 거론된다."
+                ],
+                "question": "플래넌 제도 등대지기 실종에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "외딴 등대에서 세 사람이 동시에 사라졌고, 등대 자체는 남아 있었기 때문에 상상력을 자극했다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "초자연 전설도 있지만 현실적 설명은 기상과 작업 중 사고에 집중된다.",
+                    "현실적 설명은 거센 파도나 해안 작업 중 사고에 무게를 두지만, 세 명이 왜 함께 위험 지역에 있었는지는 의문이다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "현실적 설명은 거센 파도나 해안 작업 중 사고에 무게를 두지만, 세 명이 왜 함께 위험 지역에 있었는지는 의문이다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "누가 마지막으로 밖으로 나갔는지, 왜 규정과 다른 행동을 했는지, 정확한 사고 순간이 남아 있다.",
+                    "고립된 장소에서 발생한 사건은 왜 전설로 커지기 쉬울까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "누가 마지막으로 밖으로 나갔는지, 왜 규정과 다른 행동을 했는지, 정확한 사고 순간이 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 고립된 장소에서 증인이 없는 사고는 어느 순간부터 전설이 될까?"
+    },
+    {
+        "title": "USS 사이클롭스 실종",
+        "region": "해외",
+        "place": "서대서양",
+        "year": "1918",
+        "category": "항공·해양 실종",
+        "status": "미확정",
+        "difficulty": "어려움",
+        "intro": "미 해군 화물선 USS Cyclops가 승조원과 함께 흔적 없이 사라진 사건.",
+        "source": "https://en.wikipedia.org/wiki/USS_Cyclops_(AC-4)",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "미 해군 화물선 USS Cyclops가 승조원과 함께 흔적 없이 사라진 사건.",
+                    "전시 상황, 선박 구조 문제, 폭풍, 적 공격 가능성이 거론된다."
+                ],
+                "question": "USS 사이클롭스 실종에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "전시 중 대형 해군 화물선이 구조 요청 없이 사라졌다는 점이 사건을 더 어렵게 만든다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "잔해가 확인되지 않아 결론을 내리기 어렵다.",
+                    "과적, 선박 구조 문제, 폭풍, 적 공격 가능성이 모두 거론되지만 잔해가 없어 비교 검증이 어렵다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "과적, 선박 구조 문제, 폭풍, 적 공격 가능성이 모두 거론되지만 잔해가 없어 비교 검증이 어렵다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "정확한 침몰 위치, 마지막 항로, 선체 결함과 날씨의 실제 영향이 남아 있다.",
+                    "전쟁 중 해상 실종은 사고와 공격을 어떻게 구분할 수 있을까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "정확한 침몰 위치, 마지막 항로, 선체 결함과 날씨의 실제 영향이 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘미확정’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "정확한 침몰 위치, 마지막 항로, 선체 결함과 날씨의 실제 영향이 남아 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 정확한 침몰 위치, 마지막 항로, 선체 결함과 날씨의 실제 영향이 남아 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 바다에서 잔해가 없을 때 우리는 사고와 공격을 어떻게 구분해야 할까?"
+    },
+    {
+        "title": "SS 와라타호 실종",
+        "region": "해외",
+        "place": "남아프리카 인근 해역",
+        "year": "1909",
+        "category": "항공·해양 실종",
+        "status": "미확정",
+        "difficulty": "어려움",
+        "intro": "호주와 영국을 오가던 여객화물선이 수백 명을 태운 채 사라진 사건.",
+        "source": "https://en.wikipedia.org/wiki/SS_Waratah",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "호주와 영국을 오가던 여객화물선이 수백 명을 태운 채 사라진 사건.",
+                    "선박 안정성 문제와 악천후 가능성이 주요 단서로 거론된다."
+                ],
+                "question": "SS 와라타호 실종에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "와라타호는 수백 명을 태운 여객화물선이었지만, 악천후 해역에서 흔적 없이 사라졌다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "오랜 수색에도 결정적 잔해는 확인되지 않았다.",
+                    "선박 안정성에 대한 이전 우려와 폭풍 가능성이 맞물리지만, 결정적 잔해가 없어 원인을 확정하지 못한다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "선박 안정성에 대한 이전 우려와 폭풍 가능성이 맞물리지만, 결정적 잔해가 없어 원인을 확정하지 못한다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "배가 전복되었는지, 구조적 결함이 있었는지, 실제 마지막 위치가 어디였는지가 남아 있다.",
+                    "선박 설계의 작은 결함이 대형 미스터리로 이어질 수 있을까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "배가 전복되었는지, 구조적 결함이 있었는지, 실제 마지막 위치가 어디였는지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘미확정’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "배가 전복되었는지, 구조적 결함이 있었는지, 실제 마지막 위치가 어디였는지가 남아 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 배가 전복되었는지, 구조적 결함이 있었는지, 실제 마지막 위치가 어디였는지가 남아 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 사고 전 제기된 안전 우려는 나중에 참사 원인으로 얼마나 무게 있게 보아야 할까?"
+    },
+    {
+        "title": "디아틀로프 패스 사건",
+        "region": "해외",
+        "place": "우랄산맥, 러시아",
+        "year": "1959",
+        "category": "육상·산악 실종",
+        "status": "부분 설명",
+        "difficulty": "어려움",
+        "intro": "숙련된 등산객 아홉 명이 눈 덮인 산악지대에서 의문스럽게 사망한 사건.",
+        "source": "https://en.wikipedia.org/wiki/Dyatlov_Pass_incident",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "숙련된 등산객 아홉 명이 눈 덮인 산악지대에서 의문스럽게 사망한 사건.",
+                    "텐트가 안쪽에서 찢긴 흔적과 극한 환경이 핵심 단서로 여겨진다."
+                ],
+                "question": "디아틀로프 패스 사건에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "텐트가 안쪽에서 찢겼다는 정황은 등산객들이 매우 급하게 밖으로 나갔음을 보여준다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "최근 연구들은 눈사태 또는 눈판 붕괴 가능성을 제시한다.",
+                    "저체온, 눈사태, 눈판 붕괴 설명이 제기되지만 일부 부상 양상과 행동 경로가 사람들을 계속 의심하게 만든다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "저체온, 눈사태, 눈판 붕괴 설명이 제기되지만 일부 부상 양상과 행동 경로가 사람들을 계속 의심하게 만든다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "왜 숙련자들이 장비를 두고 나갔는지, 일부 부상이 자연현상만으로 충분히 설명되는지가 남아 있다.",
+                    "가장 기괴해 보이는 단서도 자연현상으로 설명될 수 있을까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "왜 숙련자들이 장비를 두고 나갔는지, 일부 부상이 자연현상만으로 충분히 설명되는지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘부분 설명’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "왜 숙련자들이 장비를 두고 나갔는지, 일부 부상이 자연현상만으로 충분히 설명되는지가 남아 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 왜 숙련자들이 장비를 두고 나갔는지, 일부 부상이 자연현상만으로 충분히 설명되는지가 남아 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 기괴해 보이는 단서가 있어도 자연현상 설명을 먼저 검토해야 할까?"
+    },
+    {
+        "title": "유바 카운티 파이브",
+        "region": "해외",
+        "place": "미국 캘리포니아",
+        "year": "1978",
+        "category": "육상·산악 실종",
+        "status": "부분 미제",
+        "difficulty": "어려움",
+        "intro": "농구 경기를 보고 돌아가던 다섯 남성이 길을 벗어난 뒤 산악지대에서 비극적으로 발견되거나 실종된 사건.",
+        "source": "https://en.wikipedia.org/wiki/Yuba_County_Five",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "농구 경기를 보고 돌아가던 다섯 남성이 길을 벗어난 뒤 산악지대에서 비극적으로 발견되거나 실종된 사건.",
+                    "차량은 고장난 상태가 아니었다고 알려져 있다."
+                ],
+                "question": "유바 카운티 파이브에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "차량이 완전히 고장난 것도 아닌데 다섯 남성이 익숙한 길을 벗어나 산악지대로 향했다는 점이 핵심이다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "왜 그들이 낯선 산길로 향했는지가 핵심 의문이다.",
+                    "일부는 발견되었지만 한 명은 발견되지 않았고, 발견 장소의 식량과 장비가 제대로 사용되지 않은 점도 이상하다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "일부는 발견되었지만 한 명은 발견되지 않았고, 발견 장소의 식량과 장비가 제대로 사용되지 않은 점도 이상하다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "왜 그 길로 갔는지, 차를 왜 버렸는지, 생존 가능한 자원을 왜 충분히 쓰지 못했는지가 남아 있다.",
+                    "사람들이 익숙한 길을 벗어나게 만든 요인은 무엇이었을까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "왜 그 길로 갔는지, 차를 왜 버렸는지, 생존 가능한 자원을 왜 충분히 쓰지 못했는지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘부분 미제’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "왜 그 길로 갔는지, 차를 왜 버렸는지, 생존 가능한 자원을 왜 충분히 쓰지 못했는지가 남아 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 왜 그 길로 갔는지, 차를 왜 버렸는지, 생존 가능한 자원을 왜 충분히 쓰지 못했는지가 남아 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 사람의 비합리적 행동은 사건 해석에서 실수로 보아야 할까, 중요한 단서로 보아야 할까?"
+    },
+    {
+        "title": "소더 아이들 실종",
+        "region": "해외",
+        "place": "미국 웨스트버지니아",
+        "year": "1945",
+        "category": "육상·산악 실종",
+        "status": "미확정",
+        "difficulty": "어려움",
+        "intro": "화재 이후 다섯 아이가 사망한 것으로 여겨졌지만, 유해가 명확히 확인되지 않아 의문이 남은 사건.",
+        "source": "https://en.wikipedia.org/wiki/Sodder_children_disappearance",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "화재 이후 다섯 아이가 사망한 것으로 여겨졌지만, 유해가 명확히 확인되지 않아 의문이 남은 사건.",
+                    "화재 현장에서 충분한 유해가 발견되지 않았다는 의문이 있었다."
+                ],
+                "question": "소더 아이들 실종에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "화재 뒤 아이들이 사망한 것으로 여겨졌지만 충분한 유해가 확인되지 않아 가족은 납치 가능성을 의심했다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "이후 목격담과 사진 제보가 미스터리를 키웠다.",
+                    "사다리, 전화선, 차량 문제 같은 주변 정황이 우연인지 조작인지가 논란을 키웠다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "사다리, 전화선, 차량 문제 같은 주변 정황이 우연인지 조작인지가 논란을 키웠다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "아이들이 실제로 불 속에서 사망했는지, 누군가 데려갔는지, 이후 목격담이 신빙성 있는지가 남아 있다.",
+                    "가족의 믿음과 물리적 증거가 충돌할 때 무엇을 기준으로 판단해야 할까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "아이들이 실제로 불 속에서 사망했는지, 누군가 데려갔는지, 이후 목격담이 신빙성 있는지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘미확정’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "아이들이 실제로 불 속에서 사망했는지, 누군가 데려갔는지, 이후 목격담이 신빙성 있는지가 남아 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 아이들이 실제로 불 속에서 사망했는지, 누군가 데려갔는지, 이후 목격담이 신빙성 있는지가 남아 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 가족의 직감과 물리적 증거가 충돌할 때 수사는 어느 쪽에서 출발해야 할까?"
+    },
+    {
+        "title": "보몬트 남매 실종",
+        "region": "해외",
+        "place": "호주 애들레이드",
+        "year": "1966",
+        "category": "육상·산악 실종",
+        "status": "미제",
+        "difficulty": "어려움",
+        "intro": "해변으로 놀러 간 세 남매가 사라져 호주 사회에 큰 충격을 준 사건.",
+        "source": "https://en.wikipedia.org/wiki/Disappearance_of_the_Beaumont_children",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "해변으로 놀러 간 세 남매가 사라져 호주 사회에 큰 충격을 준 사건.",
+                    "아이들이 낯선 남성과 함께 있었다는 목격담이 있었다."
+                ],
+                "question": "보몬트 남매 실종에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "해변에서 놀던 세 남매가 사라졌고, 낯선 남성과 함께 있었다는 목격담이 사건의 중심이 되었다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "여러 수색과 용의자 조사가 이어졌지만 결론은 나오지 않았다.",
+                    "아이들이 낯선 사람을 경계하지 않은 듯한 정황은 범인이 미리 친근감을 형성했을 가능성을 제기한다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "아이들이 낯선 사람을 경계하지 않은 듯한 정황은 범인이 미리 친근감을 형성했을 가능성을 제기한다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "남매가 누구를 따라갔는지, 어디로 이동했는지, 시신이나 물증이 왜 발견되지 않았는지가 남아 있다.",
+                    "목격담은 시간이 지날수록 얼마나 신뢰할 수 있을까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "남매가 누구를 따라갔는지, 어디로 이동했는지, 시신이나 물증이 왜 발견되지 않았는지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘미제’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "남매가 누구를 따라갔는지, 어디로 이동했는지, 시신이나 물증이 왜 발견되지 않았는지가 남아 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 남매가 누구를 따라갔는지, 어디로 이동했는지, 시신이나 물증이 왜 발견되지 않았는지가 남아 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 아이들의 마지막 목격담은 시간이 지날수록 얼마나 신뢰할 수 있을까?"
+    },
+    {
+        "title": "매들린 매캔 실종",
+        "region": "해외",
+        "place": "포르투갈 프라이아 다 루스",
+        "year": "2007",
+        "category": "육상·산악 실종",
+        "status": "수사 지속",
+        "difficulty": "어려움",
+        "intro": "휴가지 아파트에서 영국 아동 매들린 매캔이 사라진 사건으로 국제적 관심을 받았다.",
+        "source": "https://en.wikipedia.org/wiki/Disappearance_of_Madeleine_McCann",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "휴가지 아파트에서 영국 아동 매들린 매캔이 사라진 사건으로 국제적 관심을 받았다.",
+                    "여러 국가 수사기관과 언론이 장기간 사건을 다뤘다."
+                ],
+                "question": "매들린 매캔 실종에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "휴가지 아파트에서 사라졌다는 점 때문에 가족의 동선, 출입 가능성, 주변 목격담이 모두 수사 대상이 되었다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "용의자와 가설은 많았지만 최종 결론은 확정되지 않았다.",
+                    "국제 언론과 여러 국가 수사가 결합하면서 제보는 폭증했지만, 동시에 소음도 커졌다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "국제 언론과 여러 국가 수사가 결합하면서 제보는 폭증했지만, 동시에 소음도 커졌다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "외부 침입인지, 주변 인물 관련인지, 당시 시간표 중 어느 부분이 실제로 비어 있는지가 남아 있다.",
+                    "국제적 관심은 수사에 도움일까, 방해일까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "외부 침입인지, 주변 인물 관련인지, 당시 시간표 중 어느 부분이 실제로 비어 있는지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘수사 지속’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "외부 침입인지, 주변 인물 관련인지, 당시 시간표 중 어느 부분이 실제로 비어 있는지가 남아 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 외부 침입인지, 주변 인물 관련인지, 당시 시간표 중 어느 부분이 실제로 비어 있는지가 남아 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 전 세계적 관심은 실종 수사를 돕는 힘일까, 사건을 흐리는 소음일까?"
+    },
+    {
+        "title": "모라 머레이 실종",
+        "region": "해외",
+        "place": "미국 뉴햄프셔",
+        "year": "2004",
+        "category": "육상·산악 실종",
+        "status": "미제",
+        "difficulty": "어려움",
+        "intro": "대학생 모라 머레이가 차량 사고 후 현장에서 사라진 사건.",
+        "source": "https://en.wikipedia.org/wiki/Disappearance_of_Maura_Murray",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "대학생 모라 머레이가 차량 사고 후 현장에서 사라진 사건.",
+                    "차량은 발견되었지만 본인은 발견되지 않았다."
+                ],
+                "question": "모라 머레이 실종에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "차량 사고 현장은 발견됐지만 운전자인 모라가 현장에서 사라져, 사고 이후 몇 분이 사건의 핵심이 되었다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "자발적 실종, 조난, 범죄 가능성 등 여러 가설이 남아 있다.",
+                    "자발적 이탈, 조난, 제3자 개입 가능성이 모두 열려 있고 각각을 뒷받침하는 단서가 불완전하다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "자발적 이탈, 조난, 제3자 개입 가능성이 모두 열려 있고 각각을 뒷받침하는 단서가 불완전하다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "사고 직후 누군가 차에 접근했는지, 모라가 숲으로 들어갔는지, 다른 차량을 탔는지가 남아 있다.",
+                    "현장이 남았는데 사람이 사라진 사건은 어떤 순서로 추적해야 할까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "사고 직후 누군가 차에 접근했는지, 모라가 숲으로 들어갔는지, 다른 차량을 탔는지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘미제’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "사고 직후 누군가 차에 접근했는지, 모라가 숲으로 들어갔는지, 다른 차량을 탔는지가 남아 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 사고 직후 누군가 차에 접근했는지, 모라가 숲으로 들어갔는지, 다른 차량을 탔는지가 남아 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 현장이 남아 있지만 사람이 사라진 사건에서 가장 먼저 좁혀야 할 것은 동선일까 동기일까?"
+    },
+    {
+        "title": "아샤 디그리 실종",
+        "region": "해외",
+        "place": "미국 노스캐롤라이나",
+        "year": "2000",
+        "category": "육상·산악 실종",
+        "status": "미제",
+        "difficulty": "어려움",
+        "intro": "어린 아샤 디그리가 새벽에 집을 나선 것으로 보인 뒤 사라진 사건.",
+        "source": "https://en.wikipedia.org/wiki/Disappearance_of_Asha_Degree",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "어린 아샤 디그리가 새벽에 집을 나선 것으로 보인 뒤 사라진 사건.",
+                    "도로 주변 목격담과 이후 발견된 가방이 중요한 단서로 남아 있다."
+                ],
+                "question": "아샤 디그리 실종에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "어린아이가 새벽에 집을 나선 것으로 보인다는 점이 사건을 매우 특이하게 만든다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "왜 집을 나섰는지가 핵심 의문이다.",
+                    "도로 목격담과 훗날 발견된 가방은 실제 이동 가능성을 보여주지만, 왜 나갔는지는 설명하지 못한다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "도로 목격담과 훗날 발견된 가방은 실제 이동 가능성을 보여주지만, 왜 나갔는지는 설명하지 못한다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "누가 아샤를 밖으로 유도했는지, 스스로 나간 이유가 있었는지, 가방이 발견된 과정이 무엇을 의미하는지가 남아 있다.",
+                    "사건의 시작점이 불명확하면 무엇부터 확인해야 할까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "누가 아샤를 밖으로 유도했는지, 스스로 나간 이유가 있었는지, 가방이 발견된 과정이 무엇을 의미하는지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘미제’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "누가 아샤를 밖으로 유도했는지, 스스로 나간 이유가 있었는지, 가방이 발견된 과정이 무엇을 의미하는지가 남아 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 누가 아샤를 밖으로 유도했는지, 스스로 나간 이유가 있었는지, 가방이 발견된 과정이 무엇을 의미하는지가 남아 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 아이가 스스로 움직인 정황이 있을 때, 수사는 가출과 유인을 어떻게 구분해야 할까?"
+    },
+    {
+        "title": "퍼시 포셋 실종",
+        "region": "해외",
+        "place": "브라질 아마존",
+        "year": "1925",
+        "category": "육상·산악 실종",
+        "status": "미확정",
+        "difficulty": "보통",
+        "intro": "탐험가 퍼시 포셋이 전설적 도시 Z를 찾기 위해 아마존으로 떠난 뒤 실종된 사건.",
+        "source": "https://en.wikipedia.org/wiki/Percy_Fawcett",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "탐험가 퍼시 포셋이 전설적 도시 Z를 찾기 위해 아마존으로 떠난 뒤 실종된 사건.",
+                    "아마존의 지리, 부족 접촉, 질병, 조난 가능성이 모두 거론된다."
+                ],
+                "question": "퍼시 포셋 실종에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "포셋은 아마존의 잃어버린 도시 Z를 찾겠다는 강한 믿음을 갖고 탐험을 떠났다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "그를 찾기 위한 후속 탐험도 이어졌다.",
+                    "정글 환경, 질병, 식량 문제, 현지 집단과의 접촉 가능성이 모두 실종 설명으로 거론된다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "정글 환경, 질병, 식량 문제, 현지 집단과의 접촉 가능성이 모두 실종 설명으로 거론된다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "그가 어디에서 사망했는지, 원주민과 충돌했는지, 단순 조난이었는지가 남아 있다.",
+                    "탐험가의 집념은 어디까지 모험이고 어디부터 위험일까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "그가 어디에서 사망했는지, 원주민과 충돌했는지, 단순 조난이었는지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 탐험가의 확신은 발견을 이끄는 힘일까, 위험을 과소평가하게 만드는 함정일까?"
+    },
+    {
+        "title": "마이클 록펠러 실종",
+        "region": "해외",
+        "place": "뉴기니",
+        "year": "1961",
+        "category": "육상·산악 실종",
+        "status": "미확정",
+        "difficulty": "보통",
+        "intro": "록펠러 가문의 일원이자 민속자료 수집가였던 마이클 록펠러가 뉴기니에서 실종된 사건.",
+        "source": "https://en.wikipedia.org/wiki/Michael_Rockefeller",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "록펠러 가문의 일원이자 민속자료 수집가였던 마이클 록펠러가 뉴기니에서 실종된 사건.",
+                    "배 사고 이후 해안으로 이동하려 했다는 설명이 있다."
+                ],
+                "question": "마이클 록펠러 실종에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "배 사고 이후 록펠러가 해안으로 헤엄쳐 가려 했다는 설명이 사건의 출발점이다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "익사와 현지 부족 접촉설 등 여러 가설이 남아 있다.",
+                    "익사설이 가장 단순하지만, 현지 부족과의 접촉설이 문화적 상상력과 결합해 오래 남았다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "익사설이 가장 단순하지만, 현지 부족과의 접촉설이 문화적 상상력과 결합해 오래 남았다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "그가 실제로 해안에 도달했는지, 이후 누구를 만났는지, 유해가 왜 확인되지 않았는지가 남아 있다.",
+                    "문화적 오해와 현장 정보 부족은 사건 해석을 어떻게 바꿀까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "그가 실제로 해안에 도달했는지, 이후 누구를 만났는지, 유해가 왜 확인되지 않았는지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 낯선 문화권에서 벌어진 실종을 해석할 때 외부인의 상상은 얼마나 조심해야 할까?"
+    },
+    {
+        "title": "지미 호파 실종",
+        "region": "해외",
+        "place": "미국 미시간",
+        "year": "1975",
+        "category": "육상·산악 실종",
+        "status": "미제",
+        "difficulty": "보통",
+        "intro": "미국 노동조합 지도자 지미 호파가 식당 주차장에서 마지막으로 목격된 뒤 사라진 사건.",
+        "source": "https://en.wikipedia.org/wiki/Jimmy_Hoffa",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "미국 노동조합 지도자 지미 호파가 식당 주차장에서 마지막으로 목격된 뒤 사라진 사건.",
+                    "조직범죄와의 연관설이 오랫동안 제기되었다."
+                ],
+                "question": "지미 호파 실종에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "호파는 조직범죄와 얽힌 미국 노동조합 권력의 상징적 인물이었고, 마지막 목격도 의심스러운 만남과 연결된다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "여러 장소가 수색되었지만 유해는 확인되지 않았다.",
+                    "여러 장소 수색과 증언이 있었지만 시신이 발견되지 않아 결정적 결론을 내리지 못했다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "여러 장소 수색과 증언이 있었지만 시신이 발견되지 않아 결정적 결론을 내리지 못했다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "누가 실제 실행했는지, 시신을 어디에 처리했는지, 범행 지시가 어디까지 올라가는지가 남아 있다.",
+                    "권력, 돈, 조직이 얽힌 사건은 왜 오래 미궁에 빠질까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "누가 실제 실행했는지, 시신을 어디에 처리했는지, 범행 지시가 어디까지 올라가는지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 조직적 침묵이 강한 사건에서 물증 없이 증언만으로 진실에 접근할 수 있을까?"
+    },
+    {
+        "title": "트레발린 에번스 실종",
+        "region": "해외",
+        "place": "웨일스",
+        "year": "1990",
+        "category": "육상·산악 실종",
+        "status": "미제",
+        "difficulty": "보통",
+        "intro": "골동품 가게 주인이 점심시간에 가게를 잠시 비운 뒤 사라진 사건.",
+        "source": "https://en.wikipedia.org/wiki/Disappearance_of_Trevaline_Evans",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "골동품 가게 주인이 점심시간에 가게를 잠시 비운 뒤 사라진 사건.",
+                    "가게에는 곧 돌아온다는 취지의 메모가 남아 있었다고 알려져 있다."
+                ],
+                "question": "트레발린 에번스 실종에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "가게 주인이 잠시 자리를 비운 듯한 메모를 남기고 사라졌다는 점이 일상성과 불안을 동시에 만든다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "짧은 빈틈 사이에 실종되었다는 점이 사건을 기묘하게 만든다.",
+                    "짧은 시간 동안의 이동이 핵심인데, 목격담과 추정 동선이 서로 완전히 맞물리지 않는다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "짧은 시간 동안의 이동이 핵심인데, 목격담과 추정 동선이 서로 완전히 맞물리지 않는다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "자발적으로 떠났는지, 누군가를 만났는지, 가게 밖에서 몇 분 사이 무슨 일이 있었는지가 남아 있다.",
+                    "일상적 공간에서 벌어진 실종은 왜 더 불안하게 느껴질까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "자발적으로 떠났는지, 누군가를 만났는지, 가게 밖에서 몇 분 사이 무슨 일이 있었는지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 평범한 일상 공간에서 사라진 사람의 사건은 왜 더 불길하게 느껴질까?"
+    },
+    {
+        "title": "잭 더 리퍼",
+        "region": "해외",
+        "place": "영국 런던",
+        "year": "1888",
+        "category": "해외 미제범죄",
+        "status": "미제",
+        "difficulty": "보통",
+        "intro": "빅토리아 시대 런던을 공포에 몰아넣은 정체불명의 연쇄범죄자.",
+        "source": "https://en.wikipedia.org/wiki/Jack_the_Ripper",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "빅토리아 시대 런던을 공포에 몰아넣은 정체불명의 연쇄범죄자.",
+                    "범행 지역과 편지, 당시 언론 보도가 사건 이미지를 만들었다."
+                ],
+                "question": "잭 더 리퍼에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "피해자, 장소, 시간대의 패턴은 보이지만 당시 수사기술은 지문·DNA 이전 시대라 한계가 컸다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "용의자는 많지만 결정적 증거는 없다.",
+                    "범인이 보낸 것으로 알려진 편지들은 사건을 유명하게 만들었지만, 진짜 범인의 글인지 장난인지 불확실하다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "범인이 보낸 것으로 알려진 편지들은 사건을 유명하게 만들었지만, 진짜 범인의 글인지 장난인지 불확실하다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "정확한 피해자 범위, 편지의 진위, 수많은 용의자 중 누가 실제 범인인지가 남아 있다.",
+                    "언론 보도는 사건의 실체와 전설을 어떻게 뒤섞었을까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "정확한 피해자 범위, 편지의 진위, 수많은 용의자 중 누가 실제 범인인지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 언론이 만든 괴물 이미지와 실제 범인을 어떻게 분리해야 할까?"
+    },
+    {
+        "title": "조디악 킬러",
+        "region": "해외",
+        "place": "미국 캘리포니아",
+        "year": "1960년대",
+        "category": "암호·문서·고고학",
+        "status": "미제",
+        "difficulty": "어려움",
+        "intro": "범행과 함께 암호문과 편지를 남긴 정체불명의 범죄자.",
+        "source": "https://en.wikipedia.org/wiki/Zodiac_Killer",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "범행과 함께 암호문과 편지를 남긴 정체불명의 범죄자.",
+                    "일부 암호는 해독되었지만 정체는 확정되지 않았다."
+                ],
+                "question": "조디악 킬러에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "조디악은 범행뿐 아니라 암호와 편지를 통해 언론과 수사기관을 조종하려 했다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "암호, 필적, 언론 플레이가 사건을 독특하게 만들었다.",
+                    "일부 암호가 풀렸지만, 해독된 내용이 신원으로 바로 이어지지는 않았다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "일부 암호가 풀렸지만, 해독된 내용이 신원으로 바로 이어지지는 않았다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "남은 암호의 의미, 편지 작성자의 전체 범행 범위, 실제 신원이 여전히 남아 있다.",
+                    "암호는 수사 단서였을까, 관심을 끌기 위한 장치였을까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "남은 암호의 의미, 편지 작성자의 전체 범행 범위, 실제 신원이 여전히 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘미제’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "남은 암호의 의미, 편지 작성자의 전체 범행 범위, 실제 신원이 여전히 남아 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 남은 암호의 의미, 편지 작성자의 전체 범행 범위, 실제 신원이 여전히 남아 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 범인이 일부러 남긴 단서는 진실을 말하는 것일까, 수사를 속이는 장치일까?"
+    },
+    {
+        "title": "블랙 달리아 사건",
+        "region": "해외",
+        "place": "미국 로스앤젤레스",
+        "year": "1947",
+        "category": "해외 미제범죄",
+        "status": "미제",
+        "difficulty": "어려움",
+        "intro": "엘리자베스 쇼트의 사망 사건으로, 할리우드와 언론이 결합하며 가장 유명한 미제사건 중 하나가 되었다.",
+        "source": "https://en.wikipedia.org/wiki/Black_Dahlia",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "엘리자베스 쇼트의 사망 사건으로, 할리우드와 언론이 결합하며 가장 유명한 미제사건 중 하나가 되었다.",
+                    "수많은 자백과 제보가 있었지만 범인은 확인되지 않았다."
+                ],
+                "question": "블랙 달리아 사건에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "엘리자베스 쇼트 사건은 잔혹한 범행 자체보다 할리우드와 언론의 과열 보도로 더 유명해졌다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "선정적 보도가 사건 이미지를 크게 키웠다.",
+                    "수많은 허위 자백과 제보가 수사를 흐렸고, 진짜 단서와 대중의 상상이 뒤섞였다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "수많은 허위 자백과 제보가 수사를 흐렸고, 진짜 단서와 대중의 상상이 뒤섞였다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "범인이 피해자를 어떻게 만났는지, 범행 장소가 어디였는지, 왜 그렇게 연출했는지가 남아 있다.",
+                    "유명한 미제사건일수록 진짜 단서와 소문을 어떻게 구분할까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "범인이 피해자를 어떻게 만났는지, 범행 장소가 어디였는지, 왜 그렇게 연출했는지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘미제’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "범인이 피해자를 어떻게 만났는지, 범행 장소가 어디였는지, 왜 그렇게 연출했는지가 남아 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 범인이 피해자를 어떻게 만났는지, 범행 장소가 어디였는지, 왜 그렇게 연출했는지가 남아 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 유명한 미제사건일수록 진실보다 이야기성이 더 커지는 것을 어떻게 막을 수 있을까?"
+    },
+    {
+        "title": "힌터카이펙 사건",
+        "region": "해외",
+        "place": "독일 바이에른",
+        "year": "1922",
+        "category": "해외 미제범죄",
+        "status": "미제",
+        "difficulty": "어려움",
+        "intro": "외딴 농가에서 가족과 하녀가 사망한 채 발견된 독일의 유명 미제사건.",
+        "source": "https://en.wikipedia.org/wiki/Hinterkaifeck_murders",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "외딴 농가에서 가족과 하녀가 사망한 채 발견된 독일의 유명 미제사건.",
+                    "사건 전 낯선 발자국과 다락의 소리 같은 이상 징후가 있었다고 전해진다."
+                ],
+                "question": "힌터카이펙 사건에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "사건 전 농가 주변에는 낯선 발자국과 다락 소리 같은 불안한 징후가 있었다고 전해진다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "범인이 며칠간 현장에 머물렀을 가능성이 제기되었다.",
+                    "범인이 범행 후 며칠간 농가에 머문 듯한 정황은 원한, 집착, 내부 사정을 아는 인물 가능성을 키운다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "범인이 범행 후 며칠간 농가에 머문 듯한 정황은 원한, 집착, 내부 사정을 아는 인물 가능성을 키운다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "범인이 누구였는지, 왜 가족 전체를 노렸는지, 현장에 머문 이유가 무엇인지가 남아 있다.",
+                    "외딴 공간은 왜 미스터리 서사의 배경으로 강력할까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "범인이 누구였는지, 왜 가족 전체를 노렸는지, 현장에 머문 이유가 무엇인지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘미제’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "범인이 누구였는지, 왜 가족 전체를 노렸는지, 현장에 머문 이유가 무엇인지가 남아 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 범인이 누구였는지, 왜 가족 전체를 노렸는지, 현장에 머문 이유가 무엇인지가 남아 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 범인이 현장에 머문 행동은 대담함일까, 익숙함일까, 아니면 필요에 의한 선택일까?"
+    },
+    {
+        "title": "이스달 여인",
+        "region": "해외",
+        "place": "노르웨이 베르겐",
+        "year": "1970",
+        "category": "해외 미제범죄",
+        "status": "부분 미제",
+        "difficulty": "어려움",
+        "intro": "노르웨이 계곡에서 발견된 신원 미상의 여성 사건으로, 여러 가명과 여행 기록 때문에 스파이설이 제기됐다.",
+        "source": "https://en.wikipedia.org/wiki/Isdal_Woman",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "노르웨이 계곡에서 발견된 신원 미상의 여성 사건으로, 여러 가명과 여행 기록 때문에 스파이설이 제기됐다.",
+                    "여러 여권명과 암호 같은 메모가 단서로 남았다."
+                ],
+                "question": "이스달 여인에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "여러 가명, 제거된 라벨, 복잡한 여행 기록은 그녀가 신원을 숨기려 했거나 누군가가 숨기려 했음을 보여준다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "현대 과학 분석으로 출신 지역 추정 시도도 있었다.",
+                    "암호 같은 메모와 이동 경로 때문에 스파이설이 제기되지만, 그것만으로 직업과 임무를 확정할 수는 없다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "암호 같은 메모와 이동 경로 때문에 스파이설이 제기되지만, 그것만으로 직업과 임무를 확정할 수는 없다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "그녀의 진짜 이름, 왜 노르웨이를 이동했는지, 사망이 자살·사고·타살 중 무엇인지가 남아 있다.",
+                    "신원이 지워진 사람의 삶은 어떤 흔적으로 복원될 수 있을까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "그녀의 진짜 이름, 왜 노르웨이를 이동했는지, 사망이 자살·사고·타살 중 무엇인지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘부분 미제’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "그녀의 진짜 이름, 왜 노르웨이를 이동했는지, 사망이 자살·사고·타살 중 무엇인지가 남아 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 그녀의 진짜 이름, 왜 노르웨이를 이동했는지, 사망이 자살·사고·타살 중 무엇인지가 남아 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 한 사람이 의도적으로 신원을 지웠다면, 우리는 그 사람의 삶을 어디까지 복원할 권리가 있을까?"
+    },
+    {
+        "title": "소머턴 맨",
+        "region": "해외",
+        "place": "호주 애들레이드",
+        "year": "1948",
+        "category": "암호·문서·고고학",
+        "status": "부분 해결",
+        "difficulty": "보통",
+        "intro": "해변에서 발견된 남성의 신원과 주머니 속 Tamám Shud 쪽지로 유명한 사건.",
+        "source": "https://en.wikipedia.org/wiki/Somerton_Man",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "해변에서 발견된 남성의 신원과 주머니 속 Tamám Shud 쪽지로 유명한 사건.",
+                    "시집의 암호 같은 글자열과 전화번호가 사건을 유명하게 만들었다."
+                ],
+                "question": "소머턴 맨에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "Tamám Shud 쪽지와 루바이야트 책은 이 사건을 단순 신원미상 시신에서 암호 미스터리로 바꿨다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "최근 유전학 분석으로 신원 추정이 진전되었다.",
+                    "최근 유전학 분석으로 신원 추정은 진전되었지만, 죽음의 이유와 당시 인간관계는 여전히 별개의 문제다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "최근 유전학 분석으로 신원 추정은 진전되었지만, 죽음의 이유와 당시 인간관계는 여전히 별개의 문제다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "그가 왜 해변에 있었는지, 쪽지가 어떤 의미였는지, 사망 원인이 무엇인지가 남아 있다.",
+                    "신원이 밝혀지면 미스터리는 끝나는 걸까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "그가 왜 해변에 있었는지, 쪽지가 어떤 의미였는지, 사망 원인이 무엇인지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 신원이 밝혀지면 사건은 해결된 것일까, 아니면 새로운 질문이 시작되는 것일까?"
+    },
+    {
+        "title": "박스 속 소년 사건",
+        "region": "해외",
+        "place": "미국 필라델피아",
+        "year": "1957",
+        "category": "해외 미제범죄",
+        "status": "신원 확인·범인 미상",
+        "difficulty": "어려움",
+        "intro": "오랫동안 신원을 알 수 없었던 아동 사건으로, DNA 분석을 통해 이름이 확인되었다.",
+        "source": "https://en.wikipedia.org/wiki/Murder_of_Joseph_Augustus_Zarelli",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "오랫동안 신원을 알 수 없었던 아동 사건으로, DNA 분석을 통해 이름이 확인되었다.",
+                    "신원은 밝혀졌지만 범행 주체와 동기는 여전히 명확하지 않다."
+                ],
+                "question": "박스 속 소년 사건에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "오랫동안 이름 없는 피해자로 남았던 아이가 DNA 분석으로 조셉 자렐리라는 이름을 되찾았다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "과학수사가 오래된 사건을 다시 여는 대표 사례다.",
+                    "신원 확인은 큰 진전이지만, 누가 아이를 숨지게 했고 왜 버렸는지는 별개의 문제다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "신원 확인은 큰 진전이지만, 누가 아이를 숨지게 했고 왜 버렸는지는 별개의 문제다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "가해자, 사망 전 돌봄 환경, 시신 유기 경위가 여전히 남아 있다.",
+                    "신원 확인과 범인 규명은 왜 별개의 단계일까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "가해자, 사망 전 돌봄 환경, 시신 유기 경위가 여전히 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘신원 확인·범인 미상’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "가해자, 사망 전 돌봄 환경, 시신 유기 경위가 여전히 남아 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 가해자, 사망 전 돌봄 환경, 시신 유기 경위가 여전히 남아 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 이름을 되찾은 피해자에게 사회가 해줄 수 있는 다음 단계는 무엇일까?"
+    },
+    {
+        "title": "클리블랜드 토르소 사건",
+        "region": "해외",
+        "place": "미국 클리블랜드",
+        "year": "1930년대",
+        "category": "해외 미제범죄",
+        "status": "미제",
+        "difficulty": "어려움",
+        "intro": "대공황기 클리블랜드에서 발생한 여러 신원미상 사망 사건으로 범인은 확인되지 않았다.",
+        "source": "https://en.wikipedia.org/wiki/Cleveland_Torso_Murderer",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "대공황기 클리블랜드에서 발생한 여러 신원미상 사망 사건으로 범인은 확인되지 않았다.",
+                    "일부 피해자의 신원이 끝내 확인되지 않았다."
+                ],
+                "question": "클리블랜드 토르소 사건에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "피해자 중 다수가 신원미상이었고, 대공황기의 빈곤과 이동성이 수사를 더 어렵게 만들었다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "유명 수사관 엘리엇 네스도 사건을 해결하지 못했다.",
+                    "유명 수사관 엘리엇 네스가 관여했지만, 당시 법과학과 사회적 취약계층 기록의 한계가 컸다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "유명 수사관 엘리엇 네스가 관여했지만, 당시 법과학과 사회적 취약계층 기록의 한계가 컸다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "정확한 피해자 수, 범인의 신원, 범행 장소와 이동 방식이 남아 있다.",
+                    "사회적 혼란기에는 왜 피해자 신원 확인이 더 어려워질까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "정확한 피해자 수, 범인의 신원, 범행 장소와 이동 방식이 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘미제’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "정확한 피해자 수, 범인의 신원, 범행 장소와 이동 방식이 남아 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 정확한 피해자 수, 범인의 신원, 범행 장소와 이동 방식이 남아 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 사회적으로 보이지 않던 피해자들의 사건은 왜 더 쉽게 미제로 남을까?"
+    },
+    {
+        "title": "리드 마스크 사건",
+        "region": "해외",
+        "place": "브라질 리우데자네이루",
+        "year": "1966",
+        "category": "해외 미제범죄",
+        "status": "미확정",
+        "difficulty": "어려움",
+        "intro": "두 남성이 납으로 만든 눈가리개와 메모를 남긴 채 발견된 사건.",
+        "source": "https://en.wikipedia.org/wiki/Lead_Masks_Case",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "두 남성이 납으로 만든 눈가리개와 메모를 남긴 채 발견된 사건.",
+                    "현장 메모에는 시간과 캡슐 복용을 암시하는 문구가 있었다."
+                ],
+                "question": "리드 마스크 사건에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "두 남성이 납 마스크와 이상한 메모를 남긴 채 발견되어 의식·실험·사기 가능성이 모두 제기되었다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "초자연 가설도 있지만 약물, 의식, 사기 가능성도 제기된다.",
+                    "메모에는 시간과 캡슐 복용을 암시하는 내용이 있었지만, 실제 약물이나 사망 원인을 명확히 설명하지 못한다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "메모에는 시간과 캡슐 복용을 암시하는 내용이 있었지만, 실제 약물이나 사망 원인을 명확히 설명하지 못한다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "그들이 무엇을 믿고 있었는지, 어떤 물질을 복용했는지, 제3자가 개입했는지가 남아 있다.",
+                    "기이한 물건 하나가 사건 전체의 분위기를 어떻게 바꿀까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "그들이 무엇을 믿고 있었는지, 어떤 물질을 복용했는지, 제3자가 개입했는지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘미확정’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "그들이 무엇을 믿고 있었는지, 어떤 물질을 복용했는지, 제3자가 개입했는지가 남아 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 그들이 무엇을 믿고 있었는지, 어떤 물질을 복용했는지, 제3자가 개입했는지가 남아 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 기이한 물건이 현장에 있을 때 우리는 상징과 증거를 어떻게 구분해야 할까?"
+    },
+    {
+        "title": "위치 엘름의 벨라",
+        "region": "해외",
+        "place": "영국 우스터셔",
+        "year": "1943",
+        "category": "해외 미제범죄",
+        "status": "미제",
+        "difficulty": "보통",
+        "intro": "나무 속에서 발견된 여성의 유해와 Who put Bella in the Wych Elm?라는 문구로 유명한 사건.",
+        "source": "https://en.wikipedia.org/wiki/Who_put_Bella_in_the_Wych_Elm%3F",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "나무 속에서 발견된 여성의 유해와 Who put Bella in the Wych Elm?라는 문구로 유명한 사건.",
+                    "낙서는 사건을 대중적 미스터리로 만들었다."
+                ],
+                "question": "위치 엘름의 벨라에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "나무 속에서 발견된 여성 유해와 “Bella” 문구는 신원미상 사건을 민속적 미스터리로 바꿨다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "여성의 신원과 사망 경위는 명확히 밝혀지지 않았다.",
+                    "전시 중 영국이라는 배경 때문에 간첩설, 범죄 은폐, 지역 소문이 함께 붙었다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "전시 중 영국이라는 배경 때문에 간첩설, 범죄 은폐, 지역 소문이 함께 붙었다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "여성이 누구였는지, 왜 나무 속에 숨겨졌는지, 낙서 작성자가 실제 정보를 알고 있었는지가 남아 있다.",
+                    "익명의 문구는 단서일까, 사건을 꾸미는 낙서일까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "여성이 누구였는지, 왜 나무 속에 숨겨졌는지, 낙서 작성자가 실제 정보를 알고 있었는지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 익명의 낙서는 사건 해결의 실마리일까, 대중이 만든 전설의 일부일까?"
+    },
+    {
+        "title": "서클빌 편지 사건",
+        "region": "해외",
+        "place": "미국 오하이오",
+        "year": "1970년대",
+        "category": "암호·문서·고고학",
+        "status": "논쟁",
+        "difficulty": "보통",
+        "intro": "한 지역 주민들에게 협박성 편지가 지속적으로 보내진 사건.",
+        "source": "https://en.wikipedia.org/wiki/Circleville_letters",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "한 지역 주민들에게 협박성 편지가 지속적으로 보내진 사건.",
+                    "한 명이 유죄판결을 받았지만 편지는 이후에도 계속되었다고 알려져 논란이 남았다."
+                ],
+                "question": "서클빌 편지 사건에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "협박 편지는 특정 개인의 사생활을 파고들었고, 지역사회 전체를 의심하게 만들었다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "필체, 우편 경로, 개인관계가 사건의 중심이었다.",
+                    "한 사람이 유죄판결을 받았지만 이후에도 편지가 이어졌다는 점 때문에 단일 범인 설명이 흔들렸다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "한 사람이 유죄판결을 받았지만 이후에도 편지가 이어졌다는 점 때문에 단일 범인 설명이 흔들렸다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "편지 작성자가 한 명인지 여러 명인지, 유죄판결을 받은 사람이 모든 편지의 작성자인지가 남아 있다.",
+                    "편지 작성자를 특정하는 데 필체 분석은 얼마나 믿을 수 있을까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "편지 작성자가 한 명인지 여러 명인지, 유죄판결을 받은 사람이 모든 편지의 작성자인지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 글씨와 문체가 비슷하다는 것은 얼마나 강한 증거가 될 수 있을까?"
+    },
+    {
+        "title": "텍사카나 문라이트 사건",
+        "region": "해외",
+        "place": "미국 텍사스·아칸소 접경",
+        "year": "1946",
+        "category": "해외 미제범죄",
+        "status": "미제",
+        "difficulty": "보통",
+        "intro": "작은 도시 일대에서 벌어진 연쇄 공격 사건으로 팬텀 킬러라는 별칭이 붙었다.",
+        "source": "https://en.wikipedia.org/wiki/Texarkana_Moonlight_Murders",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "작은 도시 일대에서 벌어진 연쇄 공격 사건으로 팬텀 킬러라는 별칭이 붙었다.",
+                    "범인의 복장과 야간 공격 방식이 공포를 키웠다."
+                ],
+                "question": "텍사카나 문라이트 사건에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "야간에 커플을 노린 공격과 복면 이미지가 결합해 도시 전체에 공포를 만들었다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "확정된 범인은 없고 영화와 도시 전설에도 영향을 주었다.",
+                    "목격과 생존자 증언이 있었지만, 공포가 커지면서 진짜 단서와 소문이 뒤섞였다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "목격과 생존자 증언이 있었지만, 공포가 커지면서 진짜 단서와 소문이 뒤섞였다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "팬텀 킬러의 신원, 전체 범행 범위, 특정 용의자와 물증의 연결이 남아 있다.",
+                    "공포가 커지면 목격담은 더 선명해질까, 더 흐려질까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "팬텀 킬러의 신원, 전체 범행 범위, 특정 용의자와 물증의 연결이 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 공포가 지역사회에 퍼질수록 목격담은 더 정확해질까, 더 왜곡될까?"
+    },
+    {
+        "title": "빌리스카 사건",
+        "region": "해외",
+        "place": "미국 아이오와",
+        "year": "1912",
+        "category": "해외 미제범죄",
+        "status": "미제",
+        "difficulty": "어려움",
+        "intro": "작은 마을의 한 집에서 가족과 손님들이 사망한 채 발견된 미제사건.",
+        "source": "https://en.wikipedia.org/wiki/Villisca_axe_murders",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "작은 마을의 한 집에서 가족과 손님들이 사망한 채 발견된 미제사건.",
+                    "여러 용의자가 거론되었지만 확정 판결로 이어지지 못했다."
+                ],
+                "question": "빌리스카 사건에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "작은 마을의 한 집에서 가족과 손님들이 살해되었고, 범인은 조용히 사라졌다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "현장은 현재까지도 미국 미스터리 투어의 대표 장소로 알려져 있다.",
+                    "램프가 가려지고 현장이 정리된 듯한 정황은 범인이 시간을 들였을 가능성을 보여준다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "램프가 가려지고 현장이 정리된 듯한 정황은 범인이 시간을 들였을 가능성을 보여준다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "범인이 외부 떠돌이였는지, 지역 인물이었는지, 여러 용의자 중 누가 실제로 연결되는지가 남아 있다.",
+                    "작은 마을의 대형 사건은 공동체 기억에 어떤 흔적을 남길까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "범인이 외부 떠돌이였는지, 지역 인물이었는지, 여러 용의자 중 누가 실제로 연결되는지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘미제’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "범인이 외부 떠돌이였는지, 지역 인물이었는지, 여러 용의자 중 누가 실제로 연결되는지가 남아 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 범인이 외부 떠돌이였는지, 지역 인물이었는지, 여러 용의자 중 누가 실제로 연결되는지가 남아 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 작은 공동체에서 벌어진 대형 범죄는 왜 오히려 더 해결하기 어려울 수 있을까?"
+    },
+    {
+        "title": "보이니치 필사본",
+        "region": "해외",
+        "place": "예일대 소장",
+        "year": "15세기 추정",
+        "category": "암호·문서·고고학",
+        "status": "미해독",
+        "difficulty": "어려움",
+        "intro": "알 수 없는 문자와 식물 그림으로 가득한 중세 필사본.",
+        "source": "https://beinecke.library.yale.edu/collections/highlights/voynich-manuscript",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "알 수 없는 문자와 식물 그림으로 가득한 중세 필사본.",
+                    "실제 언어인지 암호인지 정교한 장난인지 논쟁이 있다."
+                ],
+                "question": "보이니치 필사본에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "알 수 없는 문자와 식물 그림은 실제 지식서처럼 보이지만, 어떤 언어로도 확정적으로 읽히지 않는다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "통계 분석은 무작위 낙서가 아닐 가능성을 제기하지만 의미는 확정되지 않았다.",
+                    "문자 배열은 완전한 무작위처럼 보이지 않지만, 해독을 위한 비교 자료와 문맥이 부족하다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "문자 배열은 완전한 무작위처럼 보이지 않지만, 해독을 위한 비교 자료와 문맥이 부족하다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "실제 언어인지, 암호인지, 인공적으로 만든 무의미한 체계인지가 남아 있다.",
+                    "읽을 수 없는 글도 언어라고 부를 수 있을까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "실제 언어인지, 암호인지, 인공적으로 만든 무의미한 체계인지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘미해독’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "실제 언어인지, 암호인지, 인공적으로 만든 무의미한 체계인지가 남아 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 실제 언어인지, 암호인지, 인공적으로 만든 무의미한 체계인지가 남아 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 의미를 알 수 없는 문서도 구조가 있다면 지식으로 볼 수 있을까?"
+    },
+    {
+        "title": "크립토스 조각",
+        "region": "해외",
+        "place": "미국 CIA 본부",
+        "year": "1990",
+        "category": "암호·문서·고고학",
+        "status": "일부 미해독",
+        "difficulty": "어려움",
+        "intro": "CIA 본부에 설치된 암호 조각으로, 네 개의 암호 중 일부가 오랫동안 미해독 상태로 남아 있다.",
+        "source": "https://www.cia.gov/legacy/headquarters/kryptos-sculpture/",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "CIA 본부에 설치된 암호 조각으로, 네 개의 암호 중 일부가 오랫동안 미해독 상태로 남아 있다.",
+                    "첫 세 부분은 풀렸지만 마지막 부분은 수십 년간 해독가들을 끌어당겼다."
+                ],
+                "question": "크립토스 조각에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "CIA 본부에 놓인 암호 조각이라는 장소성이 이 퍼즐을 더 특별하게 만든다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "작가가 제공한 힌트도 있었지만 해독은 쉽지 않았다.",
+                    "첫 세 부분은 풀렸지만 마지막 K4가 남아 있어, 해독자들은 작가의 힌트와 암호 체계를 계속 비교한다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "첫 세 부분은 풀렸지만 마지막 K4가 남아 있어, 해독자들은 작가의 힌트와 암호 체계를 계속 비교한다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "K4의 최종 평문, 기존 해독과 이어지는 의미, 조각 전체의 메시지가 남아 있다.",
+                    "공개된 장소에 있는 비밀은 왜 더 매력적일까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "K4의 최종 평문, 기존 해독과 이어지는 의미, 조각 전체의 메시지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘일부 미해독’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "K4의 최종 평문, 기존 해독과 이어지는 의미, 조각 전체의 메시지가 남아 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. K4의 최종 평문, 기존 해독과 이어지는 의미, 조각 전체의 메시지가 남아 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 공개된 장소에 있는 비밀은 숨겨진 비밀보다 왜 더 강하게 사람을 끌어당길까?"
+    },
+    {
+        "title": "시카다 3301",
+        "region": "해외",
+        "place": "인터넷",
+        "year": "2012",
+        "category": "자연·괴현상·인터넷",
+        "status": "정체 미상",
+        "difficulty": "어려움",
+        "intro": "암호, 문학, 스테가노그래피, 실제 장소 포스터가 결합된 인터넷 퍼즐 현상.",
+        "source": "https://en.wikipedia.org/wiki/Cicada_3301",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "암호, 문학, 스테가노그래피, 실제 장소 포스터가 결합된 인터넷 퍼즐 현상.",
+                    "퍼즐은 전 세계 참가자들을 오프라인 장소까지 이끌었다."
+                ],
+                "question": "시카다 3301에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "인터넷 암호, 책, 음악, 이미지, 실제 장소 포스터가 결합되어 참가자를 온라인 밖으로 끌어냈다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "배후 조직의 목적과 정체는 확정되지 않았다.",
+                    "정교한 퍼즐 구조 때문에 단순 장난으로 보기 어렵지만, 배후 조직의 목적은 확인되지 않았다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "정교한 퍼즐 구조 때문에 단순 장난으로 보기 어렵지만, 배후 조직의 목적은 확인되지 않았다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "채용 실험인지, 예술 프로젝트인지, 이념적 집단의 선별 과정인지가 남아 있다.",
+                    "인터넷 퍼즐은 채용, 예술, 장난 중 어디에 가까울까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "채용 실험인지, 예술 프로젝트인지, 이념적 집단의 선별 과정인지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘정체 미상’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "채용 실험인지, 예술 프로젝트인지, 이념적 집단의 선별 과정인지가 남아 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 채용 실험인지, 예술 프로젝트인지, 이념적 집단의 선별 과정인지가 남아 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 목적을 밝히지 않는 퍼즐은 참가자를 시험하는 것일까, 이용하는 것일까?"
+    },
+    {
+        "title": "와우! 신호",
+        "region": "해외",
+        "place": "우주 전파 관측",
+        "year": "1977",
+        "category": "자연·괴현상·인터넷",
+        "status": "미확정",
+        "difficulty": "보통",
+        "intro": "SETI 관측 중 기록된 강한 협대역 전파 신호로, 기록지에 Wow!라고 적힌 데서 이름이 붙었다.",
+        "source": "https://en.wikipedia.org/wiki/Wow!_signal",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "SETI 관측 중 기록된 강한 협대역 전파 신호로, 기록지에 Wow!라고 적힌 데서 이름이 붙었다.",
+                    "신호는 반복 관측되지 않았다는 점이 핵심이다."
+                ],
+                "question": "와우! 신호에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "강하고 좁은 대역의 전파 신호가 기록되었지만 단 한 번만 관측되었다는 점이 핵심이다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "자연 천체, 인공 전파, 관측 조건 등 다양한 설명이 제기된다.",
+                    "반복 관측이 되지 않으면 과학적으로 검증하기 어렵고, 자연현상·인공전파·외계 신호 가능성이 모두 열려 있다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "반복 관측이 되지 않으면 과학적으로 검증하기 어렵고, 자연현상·인공전파·외계 신호 가능성이 모두 열려 있다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "신호의 실제 발생원, 반복되지 않은 이유, 지구발 간섭 가능성이 남아 있다.",
+                    "한 번뿐인 신호는 과학적으로 어느 정도 의미가 있을까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "신호의 실제 발생원, 반복되지 않은 이유, 지구발 간섭 가능성이 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 단 한 번뿐인 관측은 과학적 증거로 어느 정도까지 인정할 수 있을까?"
+    },
+    {
+        "title": "맥스 헤드룸 방송 침입",
+        "region": "해외",
+        "place": "미국 시카고",
+        "year": "1987",
+        "category": "자연·괴현상·인터넷",
+        "status": "미제",
+        "difficulty": "보통",
+        "intro": "정체불명의 인물이 TV 방송 신호를 가로채 기괴한 영상을 내보낸 사건.",
+        "source": "https://en.wikipedia.org/wiki/Max_Headroom_signal_hijacking",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "정체불명의 인물이 TV 방송 신호를 가로채 기괴한 영상을 내보낸 사건.",
+                    "당시 기술로도 가능은 했지만 전문 장비와 지식이 필요했다."
+                ],
+                "question": "맥스 헤드룸 방송 침입에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "방송 신호를 가로채는 데는 당시 기준으로도 장비와 기술 지식이 필요했다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "범인은 끝내 확인되지 않았다.",
+                    "영상은 장난처럼 보이지만, 실제 방송 시스템을 뚫었다는 점에서 단순 장난보다 훨씬 심각한 사건이었다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "영상은 장난처럼 보이지만, 실제 방송 시스템을 뚫었다는 점에서 단순 장난보다 훨씬 심각한 사건이었다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "침입자가 누구였는지, 어떤 장비를 썼는지, 내부 지식이 있었는지가 남아 있다.",
+                    "짧은 방송 장난이 왜 수십 년짜리 미스터리가 되었을까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "침입자가 누구였는지, 어떤 장비를 썼는지, 내부 지식이 있었는지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 피해가 크지 않은 해킹이라도 사회는 그것을 장난으로 봐야 할까 범죄로 봐야 할까?"
+    },
+    {
+        "title": "오크 아일랜드 미스터리",
+        "region": "해외",
+        "place": "캐나다 노바스코샤",
+        "year": "1795년경부터",
+        "category": "자연·괴현상·인터넷",
+        "status": "미확정",
+        "difficulty": "보통",
+        "intro": "섬에 숨겨진 보물과 지하 구조물을 둘러싸고 수백 년간 발굴과 추측이 이어진 이야기.",
+        "source": "https://en.wikipedia.org/wiki/Oak_Island_mystery",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "섬에 숨겨진 보물과 지하 구조물을 둘러싸고 수백 년간 발굴과 추측이 이어진 이야기.",
+                    "머니 핏이라 불리는 구덩이와 침수 구조 이야기가 중심이다."
+                ],
+                "question": "오크 아일랜드 미스터리에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "머니 핏과 침수 구조 이야기는 “무언가 의도적으로 숨겨졌다”는 상상력을 자극했다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "실제 유물 발견과 과장된 전설이 섞여 있다.",
+                    "유물과 전설, 발굴 사업이 뒤섞이면서 실제 발견과 기대가 분리되기 어려워졌다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "유물과 전설, 발굴 사업이 뒤섞이면서 실제 발견과 기대가 분리되기 어려워졌다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "보물이 실제로 있었는지, 자연 지형을 사람이 과잉해석했는지, 발견물들이 서로 연결되는지가 남아 있다.",
+                    "보물 이야기는 왜 증거가 약해도 오래 살아남을까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "보물이 실제로 있었는지, 자연 지형을 사람이 과잉해석했는지, 발견물들이 서로 연결되는지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 사람들은 왜 증거보다 가능성에 더 오래 투자하게 될까?"
+    },
+    {
+        "title": "파이스토스 원반",
+        "region": "해외",
+        "place": "크레타",
+        "year": "기원전 2천년대 추정",
+        "category": "암호·문서·고고학",
+        "status": "미해독",
+        "difficulty": "어려움",
+        "intro": "나선형으로 찍힌 기호가 새겨진 고대 원반으로, 의미와 용도가 명확하지 않다.",
+        "source": "https://en.wikipedia.org/wiki/Phaistos_Disc",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "나선형으로 찍힌 기호가 새겨진 고대 원반으로, 의미와 용도가 명확하지 않다.",
+                    "반복되는 기호가 있지만 샘플이 너무 적어 해독이 어렵다."
+                ],
+                "question": "파이스토스 원반에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "원반의 기호는 인장처럼 찍혀 있어 체계적 문자처럼 보이지만, 자료가 거의 하나뿐이다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "의례, 기록, 게임판 등 여러 용도 가설이 있다.",
+                    "문자 해독은 반복 자료와 이중언어 자료가 중요한데, 이 원반은 비교할 말뭉치가 부족하다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "문자 해독은 반복 자료와 이중언어 자료가 중요한데, 이 원반은 비교할 말뭉치가 부족하다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "기호가 실제 언어인지, 의례용 상징인지, 게임·달력·기록 중 무엇인지가 남아 있다.",
+                    "자료가 하나뿐인 문자는 해독될 수 있을까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "기호가 실제 언어인지, 의례용 상징인지, 게임·달력·기록 중 무엇인지가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            },
+            {
+                "title": "4단계. 해석이 갈리는 지점",
+                "clues": [
+                    "현재 상태는 ‘미해독’로 정리되지만, 이것이 모든 의문이 사라졌다는 뜻은 아니다.",
+                    "기호가 실제 언어인지, 의례용 상징인지, 게임·달력·기록 중 무엇인지가 남아 있다."
+                ],
+                "question": "이 사건이 오래 남은 이유는 정보가 부족해서일까, 아니면 같은 정보를 다르게 해석하기 때문일까?",
+                "answer": "이 사건은 두 가지가 함께 작용해. 기호가 실제 언어인지, 의례용 상징인지, 게임·달력·기록 중 무엇인지가 남아 있다. 여기에 결정적인 확인 자료가 부족하다는 점까지 겹치면서, 사람들은 같은 단서를 보고도 서로 다른 결론에 도달하게 돼. 그래서 마지막에는 ‘더 많은 단서’뿐 아니라 ‘어떤 단서를 더 믿을 것인가’의 문제가 남는다."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 단 하나의 유물만으로 고대인의 언어와 생각을 복원할 수 있을까?"
+    },
+    {
+        "title": "슈그버러 비문",
+        "region": "해외",
+        "place": "영국 스태퍼드셔",
+        "year": "18세기",
+        "category": "암호·문서·고고학",
+        "status": "미해독",
+        "difficulty": "보통",
+        "intro": "영국 저택 기념물에 새겨진 짧은 알파벳 배열이 다양한 해석을 낳은 미스터리.",
+        "source": "https://en.wikipedia.org/wiki/Shugborough_inscription",
+        "chapters": [
+            {
+                "title": "1단계. 사건의 첫 장면",
+                "clues": [
+                    "영국 저택 기념물에 새겨진 짧은 알파벳 배열이 다양한 해석을 낳은 미스터리.",
+                    "짧은 문자열 D O U O S V A V V M이 핵심이다."
+                ],
+                "question": "슈그버러 비문에서 처음 주목해야 할 지점은 무엇일까?",
+                "answer": "짧은 알파벳 배열은 너무 짧아서 수많은 해석이 가능하고, 바로 그 점 때문에 풀기 어렵다. 그래서 이 단계에서는 사건을 결과만 보고 판단하기보다, 마지막으로 확인된 시간·장소·행동을 먼저 고정해야 해. 그 기준점이 흔들리면 이후의 모든 가설도 같이 흔들리기 때문이야."
+            },
+            {
+                "title": "2단계. 단서가 가리키는 방향",
+                "clues": [
+                    "성배, 가족 추모문, 라틴어 약어 등 여러 설이 있다.",
+                    "라틴어 약어, 가족 추모문, 성배 암호설 등 해석은 많지만 검증할 열쇠가 없다."
+                ],
+                "question": "이 단서들은 왜 사건을 쉽게 결론내리지 못하게 만들까?",
+                "answer": "라틴어 약어, 가족 추모문, 성배 암호설 등 해석은 많지만 검증할 열쇠가 없다. 이 말은 단서가 없다는 뜻이 아니라, 단서가 곧바로 범인·원인·동기 중 하나로 연결되지 못했다는 뜻이야. 이 사건의 흥미로운 지점은 바로 여기서 생겨. 단서는 있는데, 마지막 연결고리가 비어 있는 거지."
+            },
+            {
+                "title": "3단계. 아직 풀리지 않은 부분",
+                "clues": [
+                    "문자열의 작성 의도, 해독 키, 주변 조각상과의 관계가 남아 있다.",
+                    "짧은 암호는 긴 암호보다 왜 더 풀기 어려울 수 있을까?"
+                ],
+                "question": "현재까지도 가장 크게 비어 있는 부분은 무엇일까?",
+                "answer": "문자열의 작성 의도, 해독 키, 주변 조각상과의 관계가 남아 있다. 이 부분이 해결되지 않으면 사건의 가능한 설명은 만들 수 있어도, 모두가 납득할 만한 최종 결론으로 가기는 어려워. 그래서 이 사건은 단순히 ‘무슨 일이 있었는지’보다 ‘왜 그 설명만으로는 부족한지’를 보는 게 중요해."
+            }
+        ],
+        "finalQuestion": "그렇다면.. 해석이 너무 많은 암호는 사실상 해독 불가능한 것과 같을까?"
+    }
+];
+
+    const STORAGE_KEY = "mysteryCompletedStableV2";
+
+    const state = {
+      currentIndex: 0,
+      stageIndex: 0,
+      answerOpen: false,
+      completed: JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]")
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    const els = {
+      title: $("caseTitle"),
+      tags: $("tagRow"),
+      intro: $("caseIntro"),
+      year: $("caseYear"),
+      place: $("casePlace"),
+      status: $("caseStatus"),
+      stageLabel: $("stageLabel"),
+      stageCount: $("stageCount"),
+      clueList: $("clueList"),
+      question: $("questionCard"),
+      answer: $("answerCard"),
+      final: $("finalCard"),
+      finalQ: $("finalQuestion"),
+      answerBtn: $("answerBtn"),
+      nextStage: $("nextStageBtn"),
+      complete: $("completeBtn"),
+      source: $("sourceLink"),
+      list: $("caseList"),
+      progress: $("progressText"),
+      search: $("searchInput"),
+      region: $("regionFilter"),
+      category: $("categoryFilter"),
+      diff: $("difficultyFilter"),
+      clearFilter: $("clearFilterBtn")
+    };
+
+    function makeOption(value) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = value;
+      return option;
+    }
+
+    function uniqueValues(key) {
+      return [...new Set(cases.map(item => item[key]))].filter(Boolean).sort();
+    }
+
+    function fillFilters() {
+      uniqueValues("region").forEach(value => els.region.appendChild(makeOption(value)));
+      uniqueValues("category").forEach(value => els.category.appendChild(makeOption(value)));
+      uniqueValues("difficulty").forEach(value => els.diff.appendChild(makeOption(value)));
+    }
+
+    function normalize(text) {
+      return String(text || "").toLowerCase();
+    }
+
+    function getFilteredCases() {
+      const keyword = normalize(els.search.value.trim());
+
+      return cases.filter(item => {
+        const chaptersText = item.chapters
+          .map(chapter => [
+            chapter.title,
+            chapter.question,
+            chapter.answer,
+            ...(chapter.clues || [])
+          ].join(" "))
+          .join(" ");
+
+        const searchableText = normalize([
+          item.title,
+          item.region,
+          item.place,
+          item.year,
+          item.category,
+          item.status,
+          item.difficulty,
+          item.intro,
+          item.finalQuestion,
+          chaptersText
+        ].join(" "));
+
+        return (!keyword || searchableText.includes(keyword)) &&
+          (els.region.value === "전체" || item.region === els.region.value) &&
+          (els.category.value === "전체" || item.category === els.category.value) &&
+          (els.diff.value === "전체" || item.difficulty === els.diff.value);
+      });
+    }
+
+    function safeIndex(index) {
+      if (index < 0) return 0;
+      if (index >= cases.length) return cases.length - 1;
+      return index;
+    }
+
+    function renderCase(index) {
+      state.currentIndex = safeIndex(index);
+      state.stageIndex = 0;
+      state.answerOpen = false;
+      render();
+    }
+
+    function render() {
+      const item = cases[state.currentIndex];
+      if (!item) return;
+
+      const chapters = item.chapters || [];
+      const stage = chapters[state.stageIndex] || chapters[0];
+
+      els.title.textContent = item.title;
+      els.intro.textContent = item.intro;
+      els.year.textContent = item.year;
+      els.place.textContent = item.place;
+      els.status.textContent = item.status;
+      els.source.href = item.source || "#";
+
+      els.tags.innerHTML = "";
+      [item.region, item.category, item.difficulty].forEach(tag => {
+        const span = document.createElement("span");
+        span.className = "tag" + (tag === item.difficulty ? " difficulty" : "");
+        span.textContent = tag;
+        els.tags.appendChild(span);
+      });
+
+      els.stageLabel.textContent = stage.title || "탐험 단계";
+      els.stageCount.textContent = `${state.stageIndex + 1} / ${chapters.length} 단계`;
+
+      els.clueList.innerHTML = "";
+      (stage.clues || []).forEach((clue, index) => {
+        const li = document.createElement("li");
+        li.textContent = `단서 ${index + 1}. ${clue}`;
+        els.clueList.appendChild(li);
+      });
+
+      els.question.innerHTML = `<b>질문.</b> ${stage.question || ""}`;
+      els.answer.innerHTML = `<b>답변.</b> ${stage.answer || ""}`;
+      els.answer.classList.toggle("show", state.answerOpen);
+
+      const isLastStage = state.stageIndex === chapters.length - 1;
+      const finalText = String(item.finalQuestion || "").replace(/^그렇다면\.\.\s*/, "");
+
+      els.finalQ.textContent = finalText;
+      els.final.classList.toggle("show", isLastStage && state.answerOpen);
+
+      els.answerBtn.textContent = state.answerOpen ? "답변 닫기" : "답변보기";
+      els.nextStage.disabled = !state.answerOpen || isLastStage;
+      els.nextStage.textContent = isLastStage ? "마지막 단계" : "다음 단계";
+
+      const done = state.completed.includes(state.currentIndex);
+      els.complete.textContent = done ? "완료됨 ✓ 다시 누르면 해제" : "탐험 완료";
+      els.complete.className = done ? "danger" : "secondary";
+
+      renderList();
+    }
+
+    function renderList() {
+      const filtered = getFilteredCases();
+      els.list.innerHTML = "";
+
+      if (filtered.length === 0) {
+        els.list.innerHTML = '<div class="empty">검색 결과가 없어. 필터 초기화를 눌러봐.</div>';
+      }
+
+      filtered.forEach(item => {
+        const index = cases.indexOf(item);
+
+        const button = document.createElement("button");
+        button.className = "case-item";
+
+        if (index === state.currentIndex) button.classList.add("active");
+        if (state.completed.includes(index)) button.classList.add("done");
+
+        button.innerHTML = `
+          <div class="case-item-title">${item.title}</div>
+          <div class="case-item-sub">${item.year} · ${item.place} · ${item.category} · ${item.difficulty}</div>
+        `;
+
+        button.addEventListener("click", () => renderCase(index));
+        els.list.appendChild(button);
+      });
+
+      els.progress.textContent = `${state.completed.length} / ${cases.length} 완료 · 표시 ${filtered.length}개`;
+    }
+
+    function toggleAnswer() {
+      state.answerOpen = !state.answerOpen;
+      render();
+    }
+
+    function nextStage() {
+      const item = cases[state.currentIndex];
+      const lastIndex = item.chapters.length - 1;
+
+      if (!state.answerOpen || state.stageIndex >= lastIndex) return;
+
+      state.stageIndex += 1;
+      state.answerOpen = false;
+      render();
+    }
+
+    function toggleComplete() {
+      const index = state.currentIndex;
+
+      if (state.completed.includes(index)) {
+        state.completed = state.completed.filter(value => value !== index);
+      } else {
+        state.completed.push(index);
+      }
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.completed));
+      render();
+    }
+
+    function randomCase() {
+      const filtered = getFilteredCases();
+
+      if (filtered.length === 0) {
+        alert("현재 필터에 맞는 사건이 없어. 필터 초기화를 눌러봐.");
+        return;
+      }
+
+      const item = filtered[Math.floor(Math.random() * filtered.length)];
+      renderCase(cases.indexOf(item));
+    }
+
+    function nextCase() {
+      renderCase((state.currentIndex + 1) % cases.length);
+    }
+
+    function resetProgress() {
+      if (!confirm("탐험 완료 기록을 초기화할까?")) return;
+
+      state.completed = [];
+      localStorage.removeItem(STORAGE_KEY);
+      render();
+    }
+
+    function clearFilters() {
+      els.search.value = "";
+      els.region.value = "전체";
+      els.category.value = "전체";
+      els.diff.value = "전체";
+      renderList();
+    }
+
+    fillFilters();
+
+    els.answerBtn.addEventListener("click", toggleAnswer);
+    els.nextStage.addEventListener("click", nextStage);
+    els.complete.addEventListener("click", toggleComplete);
+    $("randomBtn").addEventListener("click", randomCase);
+    $("nextCaseBtn").addEventListener("click", nextCase);
+    $("resetProgressBtn").addEventListener("click", resetProgress);
+    els.clearFilter.addEventListener("click", clearFilters);
+
+    [els.search, els.region, els.category, els.diff].forEach(element => {
+      element.addEventListener("input", renderList);
+      element.addEventListener("change", renderList);
+    });
+
+    renderCase(0);
+  </script>
+</body>
+</html>
