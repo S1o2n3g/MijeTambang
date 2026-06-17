@@ -1,0 +1,2007 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>미스터리 사건 탐험 아카이브</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Pretendard", "Apple SD Gothic Neo", Arial, sans-serif;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(255, 209, 102, 0.22), transparent 32%),
+        radial-gradient(circle at 88% 12%, rgba(116, 185, 255, 0.16), transparent 30%),
+        radial-gradient(circle at 50% 100%, rgba(157, 78, 221, 0.16), transparent 36%),
+        #0d111d;
+      color: #f6f1e8;
+    }
+
+    .app {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 30px 20px 60px;
+    }
+
+    header {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 30px;
+      padding: 34px 28px;
+      background: linear-gradient(145deg, rgba(255,255,255,.09), rgba(255,255,255,.035));
+      box-shadow: 0 24px 70px rgba(0,0,0,.32);
+    }
+
+    header::after {
+      content: "？";
+      position: absolute;
+      right: 28px;
+      top: 10px;
+      font-size: 150px;
+      font-weight: 900;
+      color: rgba(255, 209, 102, 0.08);
+      transform: rotate(12deg);
+    }
+
+    .badge {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      width: fit-content;
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: #ffd166;
+      background: rgba(255, 209, 102, .08);
+      border: 1px solid rgba(255, 209, 102, .35);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    h1 {
+      margin: 16px 0 12px;
+      font-size: clamp(32px, 5.6vw, 60px);
+      line-height: 1.05;
+      letter-spacing: -1.8px;
+    }
+
+    .lead {
+      position: relative;
+      z-index: 2;
+      max-width: 820px;
+      margin: 0;
+      color: #cbd3e6;
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+      position: relative;
+      z-index: 2;
+    }
+
+    button, select, input { font: inherit; }
+
+    button {
+      border: 0;
+      border-radius: 16px;
+      padding: 13px 16px;
+      cursor: pointer;
+      font-weight: 900;
+      transition: .18s ease;
+    }
+
+    button:hover { transform: translateY(-2px); }
+    button:active { transform: scale(.98); }
+    button:disabled { opacity: .58; cursor: not-allowed; transform: none; }
+
+    .primary {
+      background: #ffd166;
+      color: #17120a;
+      box-shadow: 0 10px 24px rgba(255, 209, 102, .18);
+    }
+
+    .secondary {
+      background: rgba(255,255,255,.10);
+      color: #f6f1e8;
+      border: 1px solid rgba(255,255,255,.16);
+    }
+
+    .danger-soft {
+      background: rgba(149, 213, 178, .16);
+      color: #b8f2d0;
+      border: 1px solid rgba(149, 213, 178, .35);
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1.4fr repeat(3, .75fr);
+      gap: 10px;
+      margin: 22px 0;
+    }
+
+    .toolbar input,
+    .toolbar select {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 16px;
+      padding: 13px 14px;
+      color: #f6f1e8;
+      background: rgba(255,255,255,.07);
+      outline: none;
+    }
+
+    .toolbar input:focus,
+    .toolbar select:focus { border-color: rgba(255, 209, 102, .5); }
+    .toolbar option { color: #111; }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.12fr .88fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .case-panel,
+    .archive-panel {
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 28px;
+      background: rgba(255,255,255,.07);
+      box-shadow: 0 20px 46px rgba(0,0,0,.25);
+      overflow: hidden;
+    }
+
+    .case-head { padding: 24px 22px 8px; }
+
+    .case-title {
+      margin: 0;
+      font-size: 29px;
+      line-height: 1.2;
+      letter-spacing: -.6px;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 13px;
+    }
+
+    .tag {
+      font-size: 12px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      color: #dfe6ff;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    .difficulty {
+      color: #ffd166;
+      background: rgba(255, 209, 102, .12);
+      border-color: rgba(255, 209, 102, .28);
+    }
+
+    .case-body { padding: 12px 22px 22px; }
+
+    .intro {
+      margin: 8px 0 18px;
+      font-size: 17px;
+      line-height: 1.72;
+      color: #f3efe7;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .meta-card {
+      min-height: 78px;
+      border-radius: 18px;
+      padding: 13px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.1);
+    }
+
+    .meta-card small {
+      display: block;
+      color: #9fa8c7;
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+
+    .meta-card strong {
+      display: block;
+      color: #fff;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .stage-status {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 18px 0 10px;
+      color: #ffd166;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .stage-dots {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+
+    .dot.active { background: #ffd166; border-color: #ffd166; }
+    .dot.done { background: #95d5b2; border-color: #95d5b2; }
+
+    .section-box {
+      margin-top: 12px;
+      border-radius: 22px;
+      padding: 17px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.11);
+      animation: fadeIn .22s ease;
+    }
+
+    .clue-box {
+      border: 1px dashed rgba(255, 209, 102, .38);
+      background: rgba(255, 209, 102, .08);
+    }
+
+    .section-title {
+      color: #ffd166;
+      font-weight: 900;
+      margin-bottom: 10px;
+    }
+
+    .stage-title {
+      margin: 0 0 12px;
+      font-size: 21px;
+      letter-spacing: -.3px;
+    }
+
+    .clue-list {
+      margin: 0;
+      padding-left: 20px;
+      color: #f5eccd;
+      line-height: 1.72;
+    }
+
+    .clue-list li { margin: 8px 0; }
+
+    .question-card {
+      margin-top: 14px;
+      border-radius: 20px;
+      padding: 16px;
+      color: #dceeff;
+      background: rgba(116, 185, 255, .10);
+      border: 1px solid rgba(116, 185, 255, .20);
+      line-height: 1.65;
+    }
+
+    .answer-card {
+      display: none;
+      margin-top: 14px;
+      border-radius: 20px;
+      padding: 16px;
+      color: #eaf7ec;
+      background: rgba(149, 213, 178, .10);
+      border: 1px solid rgba(149, 213, 178, .22);
+      line-height: 1.7;
+    }
+
+    .answer-card.show { display: block; animation: fadeIn .25s ease; }
+
+    .final-card {
+      border-color: rgba(255, 209, 102, .34);
+      background: linear-gradient(145deg, rgba(255, 209, 102, .13), rgba(116, 185, 255, .08));
+    }
+
+    .final-title {
+      margin: 0 0 10px;
+      font-size: 24px;
+      color: #ffd166;
+    }
+
+    .unsolved-list {
+      margin: 10px 0 0;
+      padding-left: 20px;
+      color: #f5eccd;
+      line-height: 1.7;
+    }
+
+    .unsolved-list li { margin: 8px 0; }
+
+    .case-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    a.source-link {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      border-radius: 16px;
+      padding: 13px 16px;
+      font-weight: 900;
+      color: #f6f1e8;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.16);
+      transition: .18s ease;
+    }
+
+    a.source-link:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 209, 102, .36);
+    }
+
+    .archive-panel { padding: 18px; }
+
+    .archive-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .archive-top h2 { margin: 0; font-size: 20px; }
+
+    .progress {
+      color: #ffd166;
+      font-weight: 900;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .case-list {
+      display: grid;
+      gap: 9px;
+      max-height: 720px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .case-item {
+      width: 100%;
+      text-align: left;
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(0,0,0,.16);
+      color: #f6f1e8;
+      border-radius: 18px;
+      padding: 12px 13px;
+      cursor: pointer;
+      transition: .15s ease;
+    }
+
+    .case-item:hover {
+      border-color: rgba(255, 209, 102, .35);
+      background: rgba(255, 209, 102, .07);
+    }
+
+    .case-item.active {
+      border-color: #ffd166;
+      background: rgba(255, 209, 102, .12);
+    }
+
+    .case-item.done::after {
+      content: "탐험 완료";
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 11px;
+      color: #10131f;
+      background: #95d5b2;
+      padding: 4px 7px;
+      border-radius: 999px;
+      font-weight: 900;
+    }
+
+    .case-item-title {
+      font-weight: 900;
+      margin-bottom: 5px;
+      line-height: 1.35;
+    }
+
+    .case-item-sub {
+      color: #9fa8c7;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .empty {
+      padding: 20px;
+      border-radius: 18px;
+      text-align: center;
+      color: #9fa8c7;
+      background: rgba(0,0,0,.16);
+      border: 1px solid rgba(255,255,255,.1);
+    }
+
+    footer {
+      margin-top: 22px;
+      color: #9fa8c7;
+      line-height: 1.6;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 860px) {
+      .toolbar { grid-template-columns: 1fr; }
+      .main-grid { grid-template-columns: 1fr; }
+      .meta { grid-template-columns: 1fr; }
+      .case-title { font-size: 24px; }
+      header { padding: 28px 22px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <header>
+      <div class="badge">🕯️ Mystery Archive Explorer</div>
+      <h1>미스터리 사건<br />탐험 아카이브</h1>
+      <p class="lead">
+        국내외 미스터리 사건 50개를 단계별로 탐험하는 미니 사이트야.
+        단서를 읽고 질문을 생각한 뒤 답변을 확인하고, 다음 단계로 넘어가며 사건의 구조를 이해하도록 만들었어.
+        마지막에는 정답이 없는 <strong>“그렇다면..”</strong> 질문으로 스스로 판단해볼 수 있어.
+      </p>
+      <div class="controls">
+        <button class="primary" id="randomBtn">랜덤 탐험 시작</button>
+        <button class="secondary" id="nextBtn">다음 사건</button>
+        <button class="secondary" id="resetBtn">탐험 기록 초기화</button>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <input id="searchInput" placeholder="사건명, 지역, 키워드 검색" />
+      <select id="regionFilter"><option value="전체">전체 지역</option></select>
+      <select id="categoryFilter"><option value="전체">전체 분류</option></select>
+      <select id="difficultyFilter"><option value="전체">전체 난이도</option></select>
+    </div>
+
+    <div class="main-grid">
+      <section class="case-panel">
+        <div class="case-head">
+          <h2 class="case-title" id="caseTitle"></h2>
+          <div class="tag-row" id="tagRow"></div>
+        </div>
+
+        <div class="case-body">
+          <p class="intro" id="caseIntro"></p>
+
+          <div class="meta">
+            <div class="meta-card"><small>발생 시기</small><strong id="caseYear"></strong></div>
+            <div class="meta-card"><small>장소</small><strong id="casePlace"></strong></div>
+            <div class="meta-card"><small>현재 상태</small><strong id="caseStatus"></strong></div>
+          </div>
+
+          <div class="stage-status">
+            <span id="stageCountText"></span>
+            <div class="stage-dots" id="stageDots"></div>
+          </div>
+
+          <div id="stageContainer"></div>
+
+          <div class="case-actions">
+            <button class="primary" id="answerBtn">답변보기</button>
+            <button class="secondary" id="stageBtn">다음 단계</button>
+            <button class="secondary" id="completeBtn">탐험 완료</button>
+            <a class="source-link" id="sourceLink" target="_blank" rel="noopener noreferrer">자료 더 보기</a>
+          </div>
+        </div>
+      </section>
+
+      <aside class="archive-panel">
+        <div class="archive-top">
+          <h2>사건 목록</h2>
+          <div class="progress" id="progressText"></div>
+        </div>
+        <div class="case-list" id="caseList"></div>
+      </aside>
+    </div>
+
+    <footer>
+      공개 자료 기반의 교육·엔터테인먼트용 요약 아카이브입니다.
+      실제 사건 피해자를 존중하기 위해 자극적 묘사는 줄이고, 사건의 구조와 미해결 지점 중심으로 구성했습니다.
+    </footer>
+  </div>
+
+  <script>
+    const cases = [
+    {
+        "title": "개구리소년 사건",
+        "region": "국내",
+        "place": "대구, 대한민국",
+        "year": "1991",
+        "category": "국내 미제·의문사",
+        "status": "미제",
+        "difficulty": "어려움",
+        "intro": "와룡산 인근으로 나간 다섯 소년이 실종된 뒤 장기간 수색에도 행방이 확인되지 않았고, 이후 유골이 발견되며 한국의 대표 장기 미제사건으로 남았다.",
+        "clues": [
+            "다섯 아이는 와룡산 쪽으로 나간 뒤 돌아오지 않았고, 사건 초반에는 ‘단순 가출·실종’ 가능성까지 함께 검토되면서 수사 초점이 분산되었다.",
+            "실종 11년 뒤 유골이 발견되었지만, 긴 시간이 지난 탓에 현장 단서와 사망 경위 판단이 크게 제한되었다.",
+            "사건명은 ‘개구리소년’으로 굳어졌지만 실제로는 도롱뇽알을 찾으러 갔다는 설명이 더 많이 알려져 있어, 초기 보도와 사실관계의 차이도 사건의 특징이다."
+        ],
+        "question": "실종 사건에서 초반 24~72시간의 수색 방향과 언론 보도는 사건 해결 가능성에 얼마나 큰 영향을 줄까?",
+        "source": "https://ko.wikipedia.org/wiki/%EA%B0%9C%EA%B5%AC%EB%A6%AC_%EC%86%8C%EB%85%84",
+        "theme": "실종·미제",
+        "unsolved": [
+            "아이들이 실종 당일 누구를 만났는지, 산에서 어떤 일이 있었는지 명확히 확인되지 않았다.",
+            "유골 발견 이후에도 범인, 범행 장소, 이동 경로가 확정되지 않았다.",
+            "초기 수색과 현장 보존이 충분했는지에 대한 아쉬움이 장기 미제사건의 교훈으로 남아 있다."
+        ]
+    },
+    {
+        "title": "이형호 유괴 살해 사건",
+        "region": "국내",
+        "place": "서울, 대한민국",
+        "year": "1991",
+        "category": "국내 미제·의문사",
+        "status": "미제",
+        "difficulty": "어려움",
+        "intro": "서울 압구정동에서 발생한 아동 유괴 사건으로, 범인의 전화 음성이 남았지만 끝내 검거되지 못했다.",
+        "clues": [
+            "범인은 피해자 가족에게 여러 차례 전화를 걸어 금전을 요구했고, 그 음성이 녹음되어 지금까지도 대표 단서로 언급된다.",
+            "전화 속 말투, 요구 방식, 이동 지시 등은 치밀해 보였지만 범인의 신원으로 직접 이어지지는 못했다.",
+            "사건은 공소시효 문제와 장기 미제사건 수사의 한계를 상징하는 사례로 자주 거론된다."
+        ],
+        "question": "목소리, 말투, 전화 패턴 같은 비물리적 단서는 과학수사에서 어느 정도까지 신원 확인에 활용될 수 있을까?",
+        "source": "https://ko.wikipedia.org/wiki/%EC%9D%B4%ED%98%95%ED%98%B8_%EC%9C%A0%EA%B4%B4_%EC%82%B4%ED%95%B4_%EC%82%AC%EA%B1%B4",
+        "theme": "유괴·미제",
+        "unsolved": [
+            "녹음된 목소리의 주인이 누구인지 끝내 특정되지 않았다.",
+            "범인이 피해자 가족의 생활 패턴을 얼마나 알고 있었는지 명확하지 않다.",
+            "공범 여부나 사전 계획의 범위도 확정되지 않았다."
+        ]
+    },
+    {
+        "title": "대구 어린이 황산테러 사건",
+        "region": "국내",
+        "place": "대구, 대한민국",
+        "year": "1999",
+        "category": "국내 미제·의문사",
+        "status": "미제",
+        "difficulty": "어려움",
+        "intro": "어린 피해자가 공격을 당한 뒤 사망했지만 범인이 특정되지 못했고, 이후 공소시효 논의의 상징적 사건이 되었다.",
+        "clues": [
+            "어린 피해자가 등굣길에 공격을 당한 사건으로, 피해자는 생전 범인과 관련된 단서를 말하려 했다고 알려져 사회적 안타까움을 키웠다.",
+            "사건은 살인죄 공소시효 폐지 논의, 이른바 ‘태완이법’과 강하게 연결되어 기억된다.",
+            "법이 바뀐 뒤에도 해당 사건에 소급 적용되는 문제는 별도의 한계로 남았다."
+        ],
+        "question": "사회적 공분으로 법이 바뀌어도, 이미 오래된 사건의 진실 규명에는 어떤 현실적 장벽이 남을까?",
+        "source": "https://ko.wikipedia.org/wiki/%EB%8C%80%EA%B5%AC_%EC%95%84%EB%8F%99_%ED%99%A9%EC%82%B0%ED%85%8C%EB%9F%AC_%EC%82%AC%EA%B1%B4",
+        "theme": "미제·법제",
+        "unsolved": [
+            "실제 공격자가 누구인지 확정되지 않았다.",
+            "범행 동기와 피해자를 특정한 이유가 명확하지 않다.",
+            "당시 확보 가능한 물증과 진술이 왜 결정적 증거로 이어지지 못했는지가 남은 쟁점이다."
+        ]
+    },
+    {
+        "title": "장준하 의문사 사건",
+        "region": "국내",
+        "place": "포천, 대한민국",
+        "year": "1975",
+        "category": "국내 미제·의문사",
+        "status": "논쟁",
+        "difficulty": "보통",
+        "intro": "언론인·정치인 장준하가 산행 중 사망한 사건으로, 실족사 발표 이후에도 정치적 배경과 함께 의문이 제기되어 왔다.",
+        "clues": [
+            "장준하는 박정희 정권 시기 비판적 목소리를 냈던 인물로, 산행 중 사망했다는 점 때문에 정치적 배경과 함께 의혹이 제기되었다.",
+            "공식적으로는 실족사로 설명되었지만, 사망 당시 정황과 부상 양상 등을 둘러싼 문제 제기가 계속되었다.",
+            "시간이 흐른 뒤에도 유족과 시민사회는 재조사와 진상규명을 요구했다."
+        ],
+        "question": "정치적 긴장이 큰 시대의 사망 사건은 ‘사고’와 ‘의혹’을 어떤 기준으로 다시 검토해야 할까?",
+        "source": "https://ko.wikipedia.org/wiki/%EC%9E%A5%EC%A4%80%ED%95%98",
+        "theme": "역사·의문사",
+        "unsolved": [
+            "사망 직전 동선과 함께 있었던 사람들의 진술을 어디까지 신뢰할 수 있는지가 핵심이다.",
+            "정치적 압력이 수사와 발표에 영향을 미쳤는지 논쟁이 남아 있다.",
+            "의문사 사건에서 사후 감정과 재조사가 어느 정도까지 과거를 복원할 수 있는지도 쟁점이다."
+        ]
+    },
+    {
+        "title": "최종길 교수 의문사 사건",
+        "region": "국내",
+        "place": "서울, 대한민국",
+        "year": "1973",
+        "category": "국내 미제·의문사",
+        "status": "진상규명",
+        "difficulty": "보통",
+        "intro": "서울대 법대 교수 최종길이 중앙정보부 조사 중 사망한 사건으로, 이후 국가권력과 인권 문제의 상징적 사건이 되었다.",
+        "clues": [
+            "서울대 법대 교수였던 최종길은 중앙정보부 조사 중 사망했고, 초기에는 자살로 발표되었다.",
+            "이후 진상규명 과정에서 국가기관 조사 과정과 인권 침해 문제가 핵심으로 떠올랐다.",
+            "사건은 권위주의 시기 국가폭력과 과거사 청산을 설명하는 대표 사례 중 하나다."
+        ],
+        "question": "국가기관이 만든 기록 자체가 의심받는 사건에서는 어떤 종류의 증거가 가장 중요해질까?",
+        "source": "https://ko.wikipedia.org/wiki/%EC%B5%9C%EC%A2%85%EA%B8%B8",
+        "theme": "역사·의문사",
+        "unsolved": [
+            "조사 과정에서 어떤 압박과 행위가 있었는지 기록만으로 완전히 복원하기 어렵다.",
+            "사망에 관여한 책임의 범위와 지휘 체계가 어디까지인지가 쟁점이었다.",
+            "국가기관의 공식 기록이 사건을 감추거나 왜곡했을 가능성을 어떻게 검증할지가 핵심이다."
+        ]
+    },
+    {
+        "title": "김훈 중위 사건",
+        "region": "국내",
+        "place": "판문점 공동경비구역",
+        "year": "1998",
+        "category": "국내 미제·의문사",
+        "status": "논쟁",
+        "difficulty": "보통",
+        "intro": "판문점 공동경비구역에서 김훈 중위가 사망한 사건으로, 자살 여부와 타살 가능성을 둘러싼 논쟁이 이어졌다.",
+        "clues": [
+            "판문점 공동경비구역이라는 특수한 군사 공간에서 발생한 사망 사건이라 현장 접근과 정보 공개에 제약이 있었다.",
+            "자살 판단과 타살 의혹이 충돌했고, 총기 사용 방식과 현장 정황이 계속 논쟁이 되었다.",
+            "군 내부 수사의 독립성과 투명성을 둘러싼 사회적 논의도 함께 커졌다."
+        ],
+        "question": "군이나 정보기관처럼 폐쇄적인 공간에서 벌어진 사건은 누가, 어떤 방식으로 검증해야 신뢰를 얻을 수 있을까?",
+        "source": "https://ko.wikipedia.org/wiki/%EA%B9%80%ED%9B%88_%EC%A4%91%EC%9C%84_%EC%82%AC%EA%B1%B4",
+        "theme": "군 의문사",
+        "unsolved": [
+            "사망 당시 정확한 상황과 제3자 개입 가능성에 대한 의문이 완전히 해소되지 않았다.",
+            "현장 감식과 초기 조사 자료가 충분히 투명하게 검증되었는지 논란이 남았다.",
+            "폐쇄적 조직 내 사건에서 외부 조사권을 어떻게 보장할지가 남은 질문이다."
+        ]
+    },
+    {
+        "title": "신정동 연쇄살인사건",
+        "region": "국내",
+        "place": "서울 양천구, 대한민국",
+        "year": "2005–2006",
+        "category": "국내 미제·의문사",
+        "status": "미제",
+        "difficulty": "어려움",
+        "intro": "서울 신정동 일대에서 발생한 연쇄 강력사건으로, 일부 피해자는 탈출했으나 범인은 특정되지 않았다.",
+        "clues": [
+            "서울 신정동 일대에서 여성을 대상으로 한 강력사건들이 이어졌고, 한 생존자의 탈출 진술이 중요한 단서가 되었다.",
+            "범인은 주거지나 은신처로 보이는 공간을 활용한 것으로 추정되며, 현장 구조와 이동 방식이 주목받았다.",
+            "사건 간 동일범 여부와 범인의 생활권이 핵심 수사 포인트로 남았다."
+        ],
+        "question": "생존자의 기억이 유일한 핵심 단서일 때, 수사는 그 진술을 어떻게 보호하면서도 검증해야 할까?",
+        "source": "https://ko.wikipedia.org/wiki/%EC%8B%A0%EC%A0%95%EB%8F%99_%EC%97%B0%EC%87%84%EC%82%B4%EC%9D%B8%EC%82%AC%EA%B1%B4",
+        "theme": "연쇄·미제",
+        "unsolved": [
+            "생존자가 말한 공간과 범인의 실제 은신처가 어디였는지 확정되지 않았다.",
+            "여러 사건이 모두 같은 범인의 소행인지도 완전히 확정되지 않았다.",
+            "범인의 신원, 직업, 거주지, 범행 후 행적은 여전히 미궁이다."
+        ]
+    },
+    {
+        "title": "치과의사 모녀 살인 사건",
+        "region": "국내",
+        "place": "서울, 대한민국",
+        "year": "1995",
+        "category": "국내 미제·의문사",
+        "status": "논쟁",
+        "difficulty": "어려움",
+        "intro": "치과의사와 딸이 사망한 사건으로, 재판과 증거 판단을 둘러싼 논란이 오래 지속되었다.",
+        "clues": [
+            "사망과 화재가 함께 얽힌 사건으로, 사망 시각·화재 발생 시점·현장 감식 결과가 재판의 핵심 쟁점이었다.",
+            "직접 증거보다 정황증거와 법의학적 판단이 큰 비중을 차지했다.",
+            "재판 과정에서 유죄와 무죄 판단이 엇갈리며 ‘합리적 의심’의 기준이 사회적으로 논의되었다."
+        ],
+        "question": "물증이 부족한 사건에서 정황증거가 쌓이면 어느 순간부터 ‘확신’이라고 부를 수 있을까?",
+        "source": "https://ko.wikipedia.org/wiki/%EC%B9%98%EA%B3%BC%EC%9D%98%EC%82%AC_%EB%AA%A8%EB%85%80_%EC%82%B4%EC%9D%B8_%EC%82%AC%EA%B1%B4",
+        "theme": "미제·재판",
+        "unsolved": [
+            "사건 현장에서 실제로 어떤 순서로 일이 벌어졌는지 완전히 재구성하기 어렵다.",
+            "화재가 증거를 훼손했을 가능성 때문에 감정 결과 해석에 한계가 있었다.",
+            "법정에서 과학적 감정과 정황 추론을 어떻게 조합해야 하는지가 남은 쟁점이다."
+        ]
+    },
+    {
+        "title": "이춘재 연쇄살인 사건",
+        "region": "국내",
+        "place": "경기 화성 일대, 대한민국",
+        "year": "1986–1991",
+        "category": "국내 미제·의문사",
+        "status": "범인 확인",
+        "difficulty": "보통",
+        "intro": "오랫동안 한국의 대표 미제사건으로 남았다가 DNA 분석과 자백으로 뒤늦게 실체가 드러난 사건.",
+        "clues": [
+            "오랫동안 ‘화성 연쇄살인 사건’으로 알려졌고, 한국 범죄수사사에서 가장 상징적인 장기 미제사건이었다.",
+            "DNA 분석 기술 발전으로 과거 증거물이 재검토되며 범인이 특정되었다.",
+            "범인이 확인된 뒤에도 공소시효가 지나 처벌에는 한계가 있었다."
+        ],
+        "question": "범인을 알아내는 것과 사법적으로 처벌하는 것 사이의 간극은 피해자와 사회에 어떤 의미를 남길까?",
+        "source": "https://ko.wikipedia.org/wiki/%EC%9D%B4%EC%B6%98%EC%9E%AC_%EC%97%B0%EC%87%84_%EC%82%B4%EC%9D%B8_%EC%82%AC%EA%B1%B4",
+        "theme": "장기미제 후 해결",
+        "unsolved": [
+            "각 사건의 세부 경위와 당시 수사 오류를 어디까지 제도적으로 평가할지가 남아 있다.",
+            "억울한 피해를 입은 사람들에 대한 회복과 책임 문제도 중요한 쟁점이다.",
+            "과거 보존 증거를 어떤 기준으로 재분석할지에 대한 시스템 문제가 남는다."
+        ]
+    },
+    {
+        "title": "정인숙 피살사건",
+        "region": "국내",
+        "place": "서울, 대한민국",
+        "year": "1970",
+        "category": "국내 미제·의문사",
+        "status": "논쟁",
+        "difficulty": "보통",
+        "intro": "1970년대 한국 사회에서 정치권 루머와 함께 큰 파장을 일으킨 피살 사건.",
+        "clues": [
+            "1970년 서울에서 발생한 피살 사건으로, 당시 권력층 관련 소문과 정치적 분위기 속에서 큰 파장을 낳았다.",
+            "사건 자체의 사실관계와 별개로 여러 루머가 덧붙으며 대중적 미스터리로 확대되었다.",
+            "당시 언론 환경과 정치권 분위기가 사건 해석에 강하게 영향을 주었다."
+        ],
+        "question": "정치적 소문이 많은 사건에서 ‘확인된 사실’과 ‘사회적 상상’을 어떻게 분리해야 할까?",
+        "source": "https://ko.wikipedia.org/wiki/%EC%A0%95%EC%9D%B8%EC%88%99_%ED%94%BC%EC%82%B4%EC%82%AC%EA%B1%B4",
+        "theme": "정치·미제",
+        "unsolved": [
+            "사건 배후에 실제로 정치적 압력이나 권력 관계가 있었는지 명확히 확정하기 어렵다.",
+            "소문과 확인된 사실을 분리하는 작업이 쉽지 않다.",
+            "당시 수사 결과가 얼마나 독립적이었는지에 대한 의문이 남아 있다."
+        ]
+    },
+    {
+        "title": "MH370 실종",
+        "region": "해외",
+        "place": "인도양 추정",
+        "year": "2014",
+        "category": "항공·해양 실종",
+        "status": "미확정",
+        "difficulty": "어려움",
+        "intro": "쿠알라룸푸르에서 베이징으로 향하던 여객기가 239명을 태운 채 사라진 현대 항공사 최대 미스터리 중 하나.",
+        "clues": [
+            "말레이시아 항공 MH370은 관제 레이더에서 사라진 뒤 위성 통신 분석을 통해 남인도양 방향으로 비행했을 가능성이 제기되었다.",
+            "일부 잔해가 인도양 주변에서 발견되었지만 핵심 동체와 블랙박스는 확인되지 않았다.",
+            "항로 이탈이 기계적 문제인지, 사람의 개입인지, 복합적 상황인지가 지금까지 논쟁의 중심이다."
+        ],
+        "question": "현대 항공 시스템은 안전해졌지만, 바다 한가운데서 사라진 비행기를 찾기 어려운 이유는 무엇일까?",
+        "source": "https://en.wikipedia.org/wiki/Malaysia_Airlines_Flight_370",
+        "theme": "항공·실종",
+        "unsolved": [
+            "항공기가 왜 원래 항로를 벗어났는지 확정되지 않았다.",
+            "마지막 비행 구간에서 조종석과 기내에서 어떤 일이 있었는지 알 수 없다.",
+            "정확한 추락 지점과 블랙박스 위치가 확인되지 않았다."
+        ]
+    },
+    {
+        "title": "아멜리아 이어하트 실종",
+        "region": "해외",
+        "place": "태평양",
+        "year": "1937",
+        "category": "항공·해양 실종",
+        "status": "미확정",
+        "difficulty": "보통",
+        "intro": "세계 일주 비행에 도전하던 비행사 아멜리아 이어하트와 항법사 프레드 누난이 태평양 상공에서 실종된 사건.",
+        "clues": [
+            "아멜리아 이어하트는 세계 일주 비행 중 하울랜드섬 인근에서 연락이 끊겼다.",
+            "연료 부족, 항법 오차, 라디오 교신 문제, 섬 착륙설 등 여러 가설이 오랫동안 제기되었다.",
+            "니쿠마로로섬 표류설처럼 일부 증거와 유물이 특정 가설을 뒷받침한다고 주장되기도 한다."
+        ],
+        "question": "마지막 교신과 항법 기록이 불완전할 때, 연구자는 어떤 가설을 더 신뢰해야 할까?",
+        "source": "https://en.wikipedia.org/wiki/Amelia_Earhart",
+        "theme": "항공·실종",
+        "unsolved": [
+            "비행기가 정확히 어디에 추락했는지 확인되지 않았다.",
+            "이어하트와 누난이 즉시 사망했는지, 어딘가에 착륙해 생존을 시도했는지 확정되지 않았다.",
+            "당시 교신 기록의 해석이 가설마다 다르게 사용된다."
+        ]
+    },
+    {
+        "title": "D. B. 쿠퍼 하이재킹",
+        "region": "해외",
+        "place": "미국 북서부",
+        "year": "1971",
+        "category": "항공·해양 실종",
+        "status": "미제",
+        "difficulty": "보통",
+        "intro": "항공기를 납치해 몸값을 받은 뒤 낙하산으로 뛰어내려 사라진 정체불명의 인물에 관한 사건.",
+        "clues": [
+            "한 남성이 여객기를 납치해 몸값과 낙하산을 요구한 뒤 비행 중 뛰어내렸다.",
+            "훗날 일부 몸값 지폐가 강가에서 발견되어, 범인의 탈출 경로와 생존 여부에 대한 논쟁을 키웠다.",
+            "범인이 사용한 이름, 복장, 말투, 항공 지식은 여러 용의자 추적의 기준이 되었다."
+        ],
+        "question": "범죄자가 사라지고 일부 증거만 남았을 때, ‘성공한 탈출’과 ‘실패했지만 시신을 못 찾은 사건’을 어떻게 구분할 수 있을까?",
+        "source": "https://www.fbi.gov/history/famous-cases/db-cooper-hijacking",
+        "theme": "범죄·실종",
+        "unsolved": [
+            "쿠퍼가 낙하 후 생존했는지 확인되지 않았다.",
+            "실제 신원이 누구인지 확정되지 않았다.",
+            "발견된 돈이 왜 그 위치에 있었는지에 대한 설명도 완전히 합의되지 않았다."
+        ]
+    },
+    {
+        "title": "메리 셀레스트호",
+        "region": "해외",
+        "place": "대서양",
+        "year": "1872",
+        "category": "항공·해양 실종",
+        "status": "미확정",
+        "difficulty": "보통",
+        "intro": "멀쩡한 상태로 발견된 배에서 선장과 승무원, 가족이 모두 사라져 있었던 고전 해양 미스터리.",
+        "clues": [
+            "배는 대서양에서 발견되었지만 승선자들은 사라져 있었고, 구명정도 함께 사라진 것으로 알려져 있다.",
+            "배 자체가 완전히 파괴된 상태는 아니었기 때문에 ‘왜 배를 버렸는가’가 핵심 미스터리가 되었다.",
+            "알코올 증기 폭발 우려, 항해 판단 착오, 악천후, 장비 오작동 등 자연적 설명이 제기된다."
+        ],
+        "question": "당시 사람들에게는 합리적이었을 선택이, 시간이 흐른 뒤에는 왜 기묘한 미스터리로 보일까?",
+        "source": "https://www.smithsonianmag.com/history/abandoned-ship-the-mary-celeste-174488104/",
+        "theme": "해양·실종",
+        "unsolved": [
+            "승선자들이 배를 떠난 정확한 이유가 확인되지 않았다.",
+            "구명정에 오른 뒤 그들이 어디로 갔고 어떻게 되었는지 알 수 없다.",
+            "남은 기록만으로 선장의 판단 상황을 복원하기 어렵다."
+        ]
+    },
+    {
+        "title": "로어노크 식민지 실종",
+        "region": "해외",
+        "place": "미국 노스캐롤라이나",
+        "year": "1590",
+        "category": "육상·산악 실종",
+        "status": "미확정",
+        "difficulty": "보통",
+        "intro": "영국 식민지 개척민들이 사라지고 CROATOAN이라는 글자만 남아 있었다는 이야기로 유명한 사건.",
+        "clues": [
+            "영국 식민지 개척민들이 사라진 뒤 CROATOAN이라는 글자가 남아 있었다는 기록이 사건의 상징이 되었다.",
+            "인근 원주민 집단과 합류했을 가능성이 가장 현실적인 가설 중 하나로 거론된다.",
+            "기록이 부족하고 당시 식민지 상황이 열악해 기아, 질병, 이동, 충돌 등 여러 설명이 가능하다."
+        ],
+        "question": "기록이 적은 역사 사건에서 ‘사라졌다’는 말은 실제 실종을 뜻할까, 다른 공동체로 흡수되었다는 뜻일까?",
+        "source": "https://en.wikipedia.org/wiki/Roanoke_Colony",
+        "theme": "역사·실종",
+        "unsolved": [
+            "식민지 주민들이 한꺼번에 어디로 이동했는지 확정되지 않았다.",
+            "CROATOAN이라는 글자가 구조 요청, 목적지 표시, 단순 정보 중 무엇이었는지 알 수 없다.",
+            "유럽 기록 중심의 해석이 원주민 사회의 실제 기억과 어떻게 엇갈리는지도 쟁점이다."
+        ]
+    },
+    {
+        "title": "플래넌 제도 등대지기 실종",
+        "region": "해외",
+        "place": "스코틀랜드 플래넌 제도",
+        "year": "1900",
+        "category": "항공·해양 실종",
+        "status": "미확정",
+        "difficulty": "보통",
+        "intro": "외딴 등대에서 근무하던 세 명의 등대지기가 갑자기 사라진 사건.",
+        "clues": [
+            "외딴 등대에서 세 명의 등대지기가 동시에 사라졌고, 도착한 교대 인원은 비어 있는 등대를 발견했다.",
+            "거센 파도, 해안 작업 중 사고, 장비 점검 과정의 위험이 현실적 설명으로 제시된다.",
+            "고립된 장소와 제한된 기록 때문에 초자연적 전설도 함께 커졌다."
+        ],
+        "question": "고립된 공간에서 발생한 사고는 왜 시간이 지날수록 ‘괴담’이 되기 쉬울까?",
+        "source": "https://en.wikipedia.org/wiki/Flannan_Isles_Lighthouse",
+        "theme": "해양·실종",
+        "unsolved": [
+            "세 사람이 왜 동시에 위험한 장소로 이동했는지 확정되지 않았다.",
+            "사고가 발생했다면 시신이나 결정적 흔적이 왜 남지 않았는지 의문이 남는다.",
+            "근무 일지와 현장 상태를 둘러싼 후대의 과장이 어디까지인지도 구분하기 어렵다."
+        ]
+    },
+    {
+        "title": "USS 사이클롭스 실종",
+        "region": "해외",
+        "place": "서대서양",
+        "year": "1918",
+        "category": "항공·해양 실종",
+        "status": "미확정",
+        "difficulty": "어려움",
+        "intro": "미 해군 화물선 USS Cyclops가 승조원과 함께 흔적 없이 사라진 사건.",
+        "clues": [
+            "미 해군 화물선 USS Cyclops는 제1차 세계대전 중 승조원과 함께 사라졌고, 뚜렷한 조난 신호도 남기지 않았다.",
+            "선박 구조 문제, 과적, 악천후, 전시 공격 가능성 등이 모두 가설로 제시된다.",
+            "잔해가 확인되지 않아 어떤 가설도 결정적으로 입증되지 못했다."
+        ],
+        "question": "전쟁 중 사라진 선박의 경우, 사고와 공격을 구분하려면 어떤 증거가 필요할까?",
+        "source": "https://en.wikipedia.org/wiki/USS_Cyclops_(AC-4)",
+        "theme": "해양·군사",
+        "unsolved": [
+            "침몰 원인이 내부 결함인지, 자연재해인지, 적대 행위인지 확정되지 않았다.",
+            "정확한 침몰 지점과 잔해 위치가 확인되지 않았다.",
+            "전시 기록과 항해 기록만으로 당시 선박 상태를 충분히 복원하기 어렵다."
+        ]
+    },
+    {
+        "title": "SS 와라타호 실종",
+        "region": "해외",
+        "place": "남아프리카 인근 해역",
+        "year": "1909",
+        "category": "항공·해양 실종",
+        "status": "미확정",
+        "difficulty": "어려움",
+        "intro": "호주와 영국을 오가던 여객화물선이 수백 명을 태운 채 사라진 사건.",
+        "clues": [
+            "SS Waratah는 남아프리카 인근 해역에서 수백 명을 태운 채 사라진 여객화물선이다.",
+            "출항 전부터 선박 안정성에 대한 우려가 있었다는 이야기와 악천후 가능성이 함께 언급된다.",
+            "여러 차례 수색에도 확정적 잔해가 발견되지 않아 ‘남반구의 타이타닉’처럼 불리기도 했다."
+        ],
+        "question": "대형 선박의 실종 사건에서 설계 결함 가설과 악천후 가설은 어떻게 비교해야 할까?",
+        "source": "https://en.wikipedia.org/wiki/SS_Waratah",
+        "theme": "해양·실종",
+        "unsolved": [
+            "선박이 실제로 어떤 상황에서 침몰했는지 확인되지 않았다.",
+            "설계상 안정성 문제가 참사에 영향을 미쳤는지 확정되지 않았다.",
+            "정확한 침몰 위치가 확인되지 않아 최종 검증이 어렵다."
+        ]
+    },
+    {
+        "title": "디아틀로프 패스 사건",
+        "region": "해외",
+        "place": "우랄산맥, 러시아",
+        "year": "1959",
+        "category": "육상·산악 실종",
+        "status": "부분 설명",
+        "difficulty": "어려움",
+        "intro": "숙련된 등산객 아홉 명이 눈 덮인 산악지대에서 의문스럽게 사망한 사건.",
+        "clues": [
+            "우랄산맥에서 등산객들이 텐트를 안쪽에서 찢고 나온 듯한 정황과 함께 사망한 채 발견되었다.",
+            "일부 시신의 위치와 부상 양상이 서로 달라, 단순 조난으로 보기 어렵다는 인상을 주었다.",
+            "최근에는 눈판 붕괴나 눈사태성 압력, 극한 환경에서의 판단 붕괴 같은 자연적 설명이 연구되었다."
+        ],
+        "question": "기괴해 보이는 현장 정황도 극한 환경과 인간의 공포를 고려하면 자연스럽게 설명될 수 있을까?",
+        "source": "https://en.wikipedia.org/wiki/Dyatlov_Pass_incident",
+        "theme": "산악·의문사",
+        "unsolved": [
+            "등산객들이 정확히 무엇을 두려워해 텐트를 떠났는지 확정되지 않았다.",
+            "부상 양상과 이동 경로를 하나의 시나리오로 완전히 설명하는 데 어려움이 있다.",
+            "공식 설명과 대중적 의혹 사이의 간극이 아직 크다."
+        ]
+    },
+    {
+        "title": "유바 카운티 파이브",
+        "region": "해외",
+        "place": "미국 캘리포니아",
+        "year": "1978",
+        "category": "육상·산악 실종",
+        "status": "부분 미제",
+        "difficulty": "어려움",
+        "intro": "농구 경기를 보고 돌아가던 다섯 남성이 길을 벗어난 뒤 산악지대에서 비극적으로 발견되거나 실종된 사건.",
+        "clues": [
+            "농구 경기를 보고 돌아가던 다섯 남성이 평소 경로와 다른 산악 지역으로 이동한 뒤 실종되거나 사망했다.",
+            "차량은 심각하게 고장난 상태가 아니었다고 알려져, 왜 차를 버렸는지가 핵심 의문이다.",
+            "일부는 산장 근처에서 발견되었지만, 한 명은 끝내 발견되지 않았다."
+        ],
+        "question": "길을 잘못 든 단순 실수와 외부 위협에 의한 이동은 현장 증거만으로 어떻게 구분할 수 있을까?",
+        "source": "https://en.wikipedia.org/wiki/Yuba_County_Five",
+        "theme": "실종·의문사",
+        "unsolved": [
+            "그들이 왜 낯선 산길로 들어갔는지 설명되지 않는다.",
+            "차를 버리고 추운 산악지대로 이동한 판단의 이유가 불명확하다.",
+            "실종자 중 한 명의 최종 행방과 제3자 개입 가능성도 남은 의문이다."
+        ]
+    },
+    {
+        "title": "소더 아이들 실종",
+        "region": "해외",
+        "place": "미국 웨스트버지니아",
+        "year": "1945",
+        "category": "육상·산악 실종",
+        "status": "미확정",
+        "difficulty": "어려움",
+        "intro": "화재 이후 다섯 아이가 사망한 것으로 여겨졌지만, 유해가 명확히 확인되지 않아 의문이 남은 사건.",
+        "clues": [
+            "크리스마스 이브 화재 이후 다섯 아이가 사망한 것으로 여겨졌지만, 가족은 유해가 충분히 발견되지 않았다는 점을 의심했다.",
+            "화재 전후의 이상한 전화, 차량 문제, 목격담 등이 여러 가설을 낳았다.",
+            "이후 한 장의 사진과 생존설이 가족의 의심을 더욱 키웠다."
+        ],
+        "question": "가족이 받아들이지 못한 공식 설명은 단순한 부정일까, 아니면 수사가 놓친 빈틈을 보여주는 신호일까?",
+        "source": "https://en.wikipedia.org/wiki/Sodder_children_disappearance",
+        "theme": "실종·화재",
+        "unsolved": [
+            "아이들이 실제로 화재에서 사망했는지, 다른 곳으로 옮겨졌는지 확정되지 않았다.",
+            "화재 원인과 방화 가능성에 대한 의문이 남아 있다.",
+            "이후 제기된 목격담과 사진의 신뢰성을 판단하기 어렵다."
+        ]
+    },
+    {
+        "title": "보몬트 남매 실종",
+        "region": "해외",
+        "place": "호주 애들레이드",
+        "year": "1966",
+        "category": "육상·산악 실종",
+        "status": "미제",
+        "difficulty": "어려움",
+        "intro": "해변으로 놀러 간 세 남매가 사라져 호주 사회에 큰 충격을 준 사건.",
+        "clues": [
+            "호주 애들레이드의 해변으로 간 세 남매가 귀가하지 않으면서 호주 사회에 큰 충격을 주었다.",
+            "아이들이 낯선 남성과 함께 있었다는 목격담이 있었지만, 그 인물은 특정되지 않았다.",
+            "사건 이후 호주에서 어린이 안전과 보호자 인식이 크게 바뀐 사례로 자주 언급된다."
+        ],
+        "question": "사회 전체의 안전 인식을 바꾼 사건에서, 집단 기억은 수사보다 오래 지속될 수 있을까?",
+        "source": "https://en.wikipedia.org/wiki/Disappearance_of_the_Beaumont_children",
+        "theme": "실종",
+        "unsolved": [
+            "아이들과 함께 목격된 남성의 신원이 확인되지 않았다.",
+            "아이들이 해변을 떠난 뒤 어디로 이동했는지 알 수 없다.",
+            "여러 용의자와 수색에도 결정적 물증이 나오지 않았다."
+        ]
+    },
+    {
+        "title": "매들린 매캔 실종",
+        "region": "해외",
+        "place": "포르투갈 프라이아 다 루스",
+        "year": "2007",
+        "category": "육상·산악 실종",
+        "status": "수사 지속",
+        "difficulty": "어려움",
+        "intro": "휴가지 아파트에서 영국 아동 매들린 매캔이 사라진 사건으로 국제적 관심을 받았다.",
+        "clues": [
+            "휴가지 아파트에서 어린 매들린 매캔이 사라지며 유럽 전역의 관심을 받은 실종 사건이다.",
+            "포르투갈과 영국 수사기관, 언론, 민간 제보가 장기간 얽히며 사건의 정보량이 매우 커졌다.",
+            "유력 용의자와 여러 수색이 있었지만 최종 결론은 확정되지 않았다."
+        ],
+        "question": "전 세계가 지켜보는 사건에서 언론 보도와 대중의 추리는 수사를 돕는 힘일까, 왜곡하는 힘일까?",
+        "source": "https://en.wikipedia.org/wiki/Disappearance_of_Madeleine_McCann",
+        "theme": "실종",
+        "unsolved": [
+            "매들린이 방에서 사라진 정확한 방식과 시간대가 확정되지 않았다.",
+            "납치, 사고, 은폐 등 가설 사이에서 결정적 증거가 부족하다.",
+            "국제적 언론 관심이 실제 수사에 어떤 영향을 줬는지도 논쟁적이다."
+        ]
+    },
+    {
+        "title": "모라 머레이 실종",
+        "region": "해외",
+        "place": "미국 뉴햄프셔",
+        "year": "2004",
+        "category": "육상·산악 실종",
+        "status": "미제",
+        "difficulty": "어려움",
+        "intro": "대학생 모라 머레이가 차량 사고 후 현장에서 사라진 사건.",
+        "clues": [
+            "대학생 모라 머레이는 뉴햄프셔의 도로에서 차량 사고를 낸 뒤 현장에서 사라졌다.",
+            "차량과 일부 소지품은 남아 있었지만, 본인의 행방은 확인되지 않았다.",
+            "사고 직전 생활 정황과 이동 이유가 복잡해 자발적 실종, 조난, 범죄 가능성이 모두 논의된다."
+        ],
+        "question": "현장에 자동차가 남아 있는 실종 사건은 ‘사고 후 조난’과 ‘범죄 개입’을 어떤 단서로 나눌 수 있을까?",
+        "source": "https://en.wikipedia.org/wiki/Disappearance_of_Maura_Murray",
+        "theme": "실종",
+        "unsolved": [
+            "사고 후 모라가 누구와 접촉했는지 확인되지 않았다.",
+            "스스로 현장을 떠났는지, 누군가의 차량에 탔는지 알 수 없다.",
+            "사전 계획이 있었는지, 우발적 사고였는지도 명확하지 않다."
+        ]
+    },
+    {
+        "title": "아샤 디그리 실종",
+        "region": "해외",
+        "place": "미국 노스캐롤라이나",
+        "year": "2000",
+        "category": "육상·산악 실종",
+        "status": "미제",
+        "difficulty": "어려움",
+        "intro": "어린 아샤 디그리가 새벽에 집을 나선 것으로 보인 뒤 사라진 사건.",
+        "clues": [
+            "어린 아샤 디그리는 새벽 시간 집을 나선 것으로 보이며, 도로 주변 목격담이 남아 있다.",
+            "이후 그녀의 가방이 집에서 멀리 떨어진 곳에서 발견되면서 사건은 더 복잡해졌다.",
+            "폭풍우가 치던 새벽에 왜 집을 나갔는지가 가장 큰 의문이다."
+        ],
+        "question": "어린아이가 위험한 시간에 스스로 이동한 것처럼 보이는 사건에서, ‘자발성’은 어떻게 검증해야 할까?",
+        "source": "https://en.wikipedia.org/wiki/Disappearance_of_Asha_Degree",
+        "theme": "실종",
+        "unsolved": [
+            "아샤가 자발적으로 나간 이유가 확인되지 않았다.",
+            "가방이 발견된 장소와 이동 경로 사이의 연결이 불분명하다.",
+            "누군가가 사전에 접촉했거나 유인했는지 알 수 없다."
+        ]
+    },
+    {
+        "title": "퍼시 포셋 실종",
+        "region": "해외",
+        "place": "브라질 아마존",
+        "year": "1925",
+        "category": "육상·산악 실종",
+        "status": "미확정",
+        "difficulty": "보통",
+        "intro": "탐험가 퍼시 포셋이 전설적 도시 Z를 찾기 위해 아마존으로 떠난 뒤 실종된 사건.",
+        "clues": [
+            "영국 탐험가 퍼시 포셋은 전설적 도시 ‘Z’를 찾겠다며 아마존으로 떠난 뒤 실종되었다.",
+            "밀림의 지리, 질병, 식량 부족, 원주민과의 접촉 가능성이 모두 거론된다.",
+            "그를 찾기 위한 후속 탐험에서도 희생자가 나올 만큼 사건은 탐험사에 큰 흔적을 남겼다."
+        ],
+        "question": "탐험가의 신념과 집념은 발견을 이끄는 힘일까, 위험을 과소평가하게 만드는 함정일까?",
+        "source": "https://en.wikipedia.org/wiki/Percy_Fawcett",
+        "theme": "탐험·실종",
+        "unsolved": [
+            "포셋 일행이 어디까지 이동했는지 정확히 확인되지 않았다.",
+            "사망 원인이 자연적 조난인지, 충돌인지, 다른 이유인지 확정되지 않았다.",
+            "그가 찾던 ‘Z’가 실제 고대 도시 전승과 어느 정도 연결되는지도 논쟁적이다."
+        ]
+    },
+    {
+        "title": "마이클 록펠러 실종",
+        "region": "해외",
+        "place": "뉴기니",
+        "year": "1961",
+        "category": "육상·산악 실종",
+        "status": "미확정",
+        "difficulty": "보통",
+        "intro": "록펠러 가문의 일원이자 민속자료 수집가였던 마이클 록펠러가 뉴기니에서 실종된 사건.",
+        "clues": [
+            "민속자료를 수집하던 마이클 록펠러는 뉴기니에서 배 사고 후 해안으로 이동하려다 실종되었다.",
+            "익사 가능성과 현지 부족과의 접촉설이 오랫동안 논의되었다.",
+            "사건은 서구 탐험가, 식민주의적 시선, 현지 문화 해석 문제가 얽혀 있다."
+        ],
+        "question": "문화적 거리와 편견이 큰 사건에서 외부 연구자는 어떤 태도로 증언을 해석해야 할까?",
+        "source": "https://en.wikipedia.org/wiki/Michael_Rockefeller",
+        "theme": "탐험·실종",
+        "unsolved": [
+            "록펠러가 실제로 해안에 도착했는지 확인되지 않았다.",
+            "사망 원인이 익사인지, 사고 이후의 사건인지 확정되지 않았다.",
+            "현지 사회에 대한 외부인의 추측이 사실과 얼마나 다른지도 판단하기 어렵다."
+        ]
+    },
+    {
+        "title": "지미 호파 실종",
+        "region": "해외",
+        "place": "미국 미시간",
+        "year": "1975",
+        "category": "해외 미제범죄",
+        "status": "미제",
+        "difficulty": "보통",
+        "intro": "미국 노동조합 지도자 지미 호파가 식당 주차장에서 마지막으로 목격된 뒤 사라진 사건.",
+        "clues": [
+            "미국 노동조합 지도자 지미 호파는 식당 주차장에서 마지막으로 목격된 뒤 사라졌다.",
+            "조직범죄와 노동조합 권력 다툼이 사건 배경으로 자주 거론된다.",
+            "여러 장소가 수색되었지만 시신이나 결정적 물증은 확인되지 않았다."
+        ],
+        "question": "권력과 조직범죄가 얽힌 실종 사건은 왜 ‘소문은 많은데 증거는 적은’ 형태가 되기 쉬울까?",
+        "source": "https://en.wikipedia.org/wiki/Jimmy_Hoffa",
+        "theme": "실종·조직범죄",
+        "unsolved": [
+            "호파가 마지막으로 누구를 만났고 어디로 이동했는지 확정되지 않았다.",
+            "조직범죄가 실제로 어떤 방식으로 개입했는지 입증되지 않았다.",
+            "시신이 발견되지 않아 사건의 최종 시나리오가 계속 가설로 남아 있다."
+        ]
+    },
+    {
+        "title": "트레발린 에번스 실종",
+        "region": "해외",
+        "place": "웨일스",
+        "year": "1990",
+        "category": "육상·산악 실종",
+        "status": "미제",
+        "difficulty": "보통",
+        "intro": "골동품 가게 주인이 점심시간에 가게를 잠시 비운 뒤 사라진 사건.",
+        "clues": [
+            "웨일스의 골동품 가게 주인 트레발린 에번스는 가게를 잠시 비운 뒤 돌아오지 않았다.",
+            "가게에는 곧 돌아오겠다는 취지의 메모가 남아 있었던 것으로 알려져 갑작스러운 실종처럼 보인다.",
+            "목격담은 있었지만 그녀가 누구와 어디로 갔는지 확정되지 않았다."
+        ],
+        "question": "평범한 일상 공간에서 사라진 사람의 마지막 몇 분은 어떻게 복원할 수 있을까?",
+        "source": "https://en.wikipedia.org/wiki/Disappearance_of_Trevaline_Evans",
+        "theme": "실종",
+        "unsolved": [
+            "그녀가 자발적으로 가게를 나갔는지, 누군가에게 유인되었는지 불명확하다.",
+            "실종 직후의 이동 경로가 확인되지 않았다.",
+            "짧은 시간 안에 흔적 없이 사라진 이유가 설명되지 않는다."
+        ]
+    },
+    {
+        "title": "잭 더 리퍼",
+        "region": "해외",
+        "place": "영국 런던",
+        "year": "1888",
+        "category": "해외 미제범죄",
+        "status": "미제",
+        "difficulty": "보통",
+        "intro": "빅토리아 시대 런던을 공포에 몰아넣은 정체불명의 연쇄범죄자.",
+        "clues": [
+            "1888년 런던 화이트채플 일대에서 벌어진 연쇄 살인 사건으로, 당시 빈곤과 도시 치안 문제가 배경에 있었다.",
+            "범인을 자처하는 편지들이 언론에 전달되며 ‘잭 더 리퍼’라는 이름이 대중적 공포를 만들었다.",
+            "많은 용의자가 제기되었지만 현대 기준의 물증은 부족하다."
+        ],
+        "question": "언론이 만든 이름과 이미지가 실제 수사보다 더 오래 남을 때, 우리는 사건을 어떻게 기억하게 될까?",
+        "source": "https://en.wikipedia.org/wiki/Jack_the_Ripper",
+        "theme": "역사범죄·미제",
+        "unsolved": [
+            "실제 범인이 편지를 보냈는지, 언론이나 장난의 산물인지 확정되지 않았다.",
+            "범행으로 인정되는 사건의 범위부터 연구자마다 다르다.",
+            "용의자 목록은 길지만 결정적 증거가 없다."
+        ]
+    },
+    {
+        "title": "조디악 킬러",
+        "region": "해외",
+        "place": "미국 캘리포니아",
+        "year": "1960년대",
+        "category": "해외 미제범죄",
+        "status": "미제",
+        "difficulty": "어려움",
+        "intro": "범행과 함께 암호문과 편지를 남긴 정체불명의 범죄자.",
+        "clues": [
+            "조디악은 범행 주장 편지와 암호문을 언론사에 보내며 자신의 존재를 과시했다.",
+            "일부 암호는 해독되었지만, 모든 메시지가 범인 신원으로 이어지지는 않았다.",
+            "필적, 암호, 목격자 진술, 범행 지역이 모두 단서였지만 하나의 인물로 확정되지는 않았다."
+        ],
+        "question": "범인이 남긴 암호와 편지는 진실을 감춘 장난일까, 아니면 수사기관을 향한 통제 욕구의 표현일까?",
+        "source": "https://en.wikipedia.org/wiki/Zodiac_Killer",
+        "theme": "암호·미제",
+        "unsolved": [
+            "조디악의 실제 신원은 공식적으로 확정되지 않았다.",
+            "그가 주장한 범행 수와 실제 범행 수가 어디까지 일치하는지 불분명하다.",
+            "미해독 또는 해석 논쟁이 있는 메시지가 여전히 관심을 끈다."
+        ]
+    },
+    {
+        "title": "블랙 달리아 사건",
+        "region": "해외",
+        "place": "미국 로스앤젤레스",
+        "year": "1947",
+        "category": "해외 미제범죄",
+        "status": "미제",
+        "difficulty": "어려움",
+        "intro": "엘리자베스 쇼트의 사망 사건으로, 할리우드와 언론이 결합하며 가장 유명한 미제사건 중 하나가 되었다.",
+        "clues": [
+            "엘리자베스 쇼트의 사망 사건은 할리우드 이미지와 결합하며 미국의 대표 콜드케이스가 되었다.",
+            "수많은 허위 자백과 제보가 쏟아져 실제 단서를 가리는 문제가 발생했다.",
+            "언론은 피해자의 삶을 자극적으로 소비했고, 사건의 전설화에 큰 영향을 줬다."
+        ],
+        "question": "유명해진 미제사건에서 가장 먼저 보호되어야 할 것은 ‘사건의 흥미’일까, ‘피해자의 실제 삶’일까?",
+        "source": "https://en.wikipedia.org/wiki/Black_Dahlia",
+        "theme": "콜드케이스",
+        "unsolved": [
+            "범인의 신원과 피해자와의 접점이 확인되지 않았다.",
+            "사건 전 마지막 동선과 만난 사람들에 대해 빈틈이 남아 있다.",
+            "대중문화가 만든 이미지와 실제 피해자의 삶을 분리하는 일도 중요하다."
+        ]
+    },
+    {
+        "title": "힌터카이펙 사건",
+        "region": "해외",
+        "place": "독일 바이에른",
+        "year": "1922",
+        "category": "해외 미제범죄",
+        "status": "미제",
+        "difficulty": "어려움",
+        "intro": "외딴 농가에서 가족과 하녀가 사망한 채 발견된 독일의 유명 미제사건.",
+        "clues": [
+            "외딴 독일 농가에서 가족과 하녀가 사망한 사건으로, 사건 전 낯선 발자국과 이상한 소리 같은 정황이 전해진다.",
+            "범인이 범행 후 현장에 머무른 듯한 정황이 있어 더욱 기괴하게 여겨진다.",
+            "가족관계, 이웃과의 갈등, 외부 침입 가능성 등 여러 방향의 추정이 있었다."
+        ],
+        "question": "외딴 공간에서 벌어진 사건은 왜 작은 이상 징후 하나하나가 더 강한 공포로 읽히게 될까?",
+        "source": "https://en.wikipedia.org/wiki/Hinterkaifeck_murders",
+        "theme": "농가·미제",
+        "unsolved": [
+            "범인이 누구인지 확정되지 않았다.",
+            "사건 전 이상 징후가 실제 범인과 연결되는지 불명확하다.",
+            "범인이 왜 현장에 머물렀는지, 또는 그렇게 보이는 정황이 어떻게 생겼는지 논쟁이 남는다."
+        ]
+    },
+    {
+        "title": "이스달 여인",
+        "region": "해외",
+        "place": "노르웨이 베르겐",
+        "year": "1970",
+        "category": "해외 미제범죄",
+        "status": "부분 미제",
+        "difficulty": "어려움",
+        "intro": "노르웨이 계곡에서 발견된 신원 미상의 여성 사건으로, 여러 가명과 여행 기록 때문에 스파이설이 제기됐다.",
+        "clues": [
+            "노르웨이 베르겐 인근에서 신원 미상의 여성이 발견되었고, 여러 가명과 여행 기록이 확인되었다.",
+            "소지품의 표식이 제거되어 있었고, 암호처럼 보이는 메모가 남아 있어 스파이설이 제기되었다.",
+            "현대 DNA와 동위원소 분석은 출신 지역 추정에 도움을 주었지만 사건 전체를 설명하지는 못했다."
+        ],
+        "question": "한 사람이 의도적으로 신원을 지운 것처럼 보일 때, 그 행동은 범죄의 흔적일까 생존 전략일까?",
+        "source": "https://en.wikipedia.org/wiki/Isdal_Woman",
+        "theme": "신원미상",
+        "unsolved": [
+            "여성의 실제 신원과 직업이 확정되지 않았다.",
+            "왜 여러 가명을 사용하며 이동했는지 알 수 없다.",
+            "사망이 자살, 사고, 타살 중 무엇인지 완전히 합의되지 않았다."
+        ]
+    },
+    {
+        "title": "소머턴 맨",
+        "region": "해외",
+        "place": "호주 애들레이드",
+        "year": "1948",
+        "category": "해외 미제범죄",
+        "status": "부분 해결",
+        "difficulty": "보통",
+        "intro": "해변에서 발견된 남성의 신원과 주머니 속 Tamám Shud 쪽지로 유명한 사건.",
+        "clues": [
+            "호주 해변에서 발견된 남성의 주머니에서 ‘Tamám Shud’라는 문구가 적힌 종이가 발견되며 유명해졌다.",
+            "관련된 시집, 암호처럼 보이는 글자열, 전화번호가 사건을 복잡하게 만들었다.",
+            "최근 유전학 분석으로 신원 추정은 진전되었지만 사망 경위는 별개의 문제로 남아 있다."
+        ],
+        "question": "이름을 찾는 것과 죽음의 이유를 이해하는 것은 왜 서로 다른 종류의 해결일까?",
+        "source": "https://en.wikipedia.org/wiki/Somerton_Man",
+        "theme": "신원미상·암호",
+        "unsolved": [
+            "신원 추정이 이루어져도 왜 그 장소에서 사망했는지는 명확하지 않다.",
+            "암호처럼 보이는 글자열의 의미가 확정되지 않았다.",
+            "독살, 자살, 자연사 등 사망 원인에 대한 해석이 완전히 닫히지 않았다."
+        ]
+    },
+    {
+        "title": "박스 속 소년 사건",
+        "region": "해외",
+        "place": "미국 필라델피아",
+        "year": "1957",
+        "category": "해외 미제범죄",
+        "status": "신원 확인·범인 미상",
+        "difficulty": "어려움",
+        "intro": "오랫동안 신원을 알 수 없었던 아동 사건으로, DNA 분석을 통해 이름이 확인되었다.",
+        "clues": [
+            "오랫동안 ‘박스 속 소년’으로 불린 아동의 신원은 DNA 계보 분석을 통해 뒤늦게 확인되었다.",
+            "신원이 밝혀졌지만, 아이에게 실제로 무슨 일이 있었는지와 가해자가 누구인지는 여전히 별도 문제로 남았다.",
+            "오래된 미제사건에서 DNA가 할 수 있는 일과 할 수 없는 일이 뚜렷하게 드러난 사례다."
+        ],
+        "question": "과학기술이 피해자의 이름을 되찾아줄 수 있다면, 그다음 사회가 해야 할 일은 무엇일까?",
+        "source": "https://en.wikipedia.org/wiki/Murder_of_Joseph_Augustus_Zarelli",
+        "theme": "신원미상·콜드케이스",
+        "unsolved": [
+            "가해자와 직접적인 범행 경위는 확정되지 않았다.",
+            "아이의 마지막 생활 환경과 보호 책임 문제가 완전히 밝혀지지 않았다.",
+            "DNA로 신원을 찾은 뒤에도 법적 책임으로 이어지기 어려운 한계가 있다."
+        ]
+    },
+    {
+        "title": "클리블랜드 토르소 사건",
+        "region": "해외",
+        "place": "미국 클리블랜드",
+        "year": "1930년대",
+        "category": "해외 미제범죄",
+        "status": "미제",
+        "difficulty": "어려움",
+        "intro": "대공황기 클리블랜드에서 발생한 여러 신원미상 사망 사건으로 범인은 확인되지 않았다.",
+        "clues": [
+            "대공황기 클리블랜드에서 여러 신원미상 피해자가 발견된 연쇄 미제사건이다.",
+            "일부 피해자는 신원 확인이 되지 않았고, 당시 빈곤층과 이동 인구가 많은 사회적 배경이 수사를 어렵게 했다.",
+            "유명 수사관 엘리엇 네스가 관련 수사를 지휘했지만 범인을 특정하지 못했다."
+        ],
+        "question": "피해자의 이름조차 알 수 없는 사건에서 수사는 어디서부터 시작되어야 할까?",
+        "source": "https://en.wikipedia.org/wiki/Cleveland_Torso_Murderer",
+        "theme": "연쇄·미제",
+        "unsolved": [
+            "범인의 신원과 실제 피해자 수가 확정되지 않았다.",
+            "모든 사건이 같은 범인의 소행인지도 명확하지 않다.",
+            "피해자 신원 미확인은 사건 해결을 근본적으로 어렵게 만들었다."
+        ]
+    },
+    {
+        "title": "리드 마스크 사건",
+        "region": "해외",
+        "place": "브라질 리우데자네이루",
+        "year": "1966",
+        "category": "해외 미제범죄",
+        "status": "미확정",
+        "difficulty": "어려움",
+        "intro": "두 남성이 납으로 만든 눈가리개와 메모를 남긴 채 발견된 사건.",
+        "clues": [
+            "브라질에서 두 남성이 납으로 만든 눈가리개와 메모를 남긴 채 발견된 사건이다.",
+            "메모에는 특정 시간과 캡슐 복용을 암시하는 문구가 적혀 있었다고 알려져 있다.",
+            "초자연적 의식, 약물 실험, 사기, 사고 등 다양한 설명이 제기되었다."
+        ],
+        "question": "기이한 소품이 많은 사건에서 우리는 ‘의미 있는 단서’와 ‘우연히 이상해 보이는 물건’을 어떻게 구분할까?",
+        "source": "https://en.wikipedia.org/wiki/Lead_Masks_Case",
+        "theme": "의문사",
+        "unsolved": [
+            "두 남성이 실제로 무엇을 믿고 그 장소에 갔는지 확인되지 않았다.",
+            "복용했을 가능성이 있는 물질과 사망 원인이 명확히 규명되지 않았다.",
+            "현장 물건들이 의식의 일부인지, 누군가가 연출한 흔적인지 알 수 없다."
+        ]
+    },
+    {
+        "title": "위치 엘름의 벨라",
+        "region": "해외",
+        "place": "영국 우스터셔",
+        "year": "1943",
+        "category": "해외 미제범죄",
+        "status": "미제",
+        "difficulty": "보통",
+        "intro": "나무 속에서 발견된 여성의 유해와 Who put Bella in the Wych Elm?라는 문구로 유명한 사건.",
+        "clues": [
+            "영국 우스터셔의 나무 속에서 여성의 유해가 발견된 뒤, ‘Who put Bella in the Wych Elm?’라는 낙서가 반복되며 사건이 유명해졌다.",
+            "낙서의 ‘Bella’가 피해자의 이름인지, 누군가가 알고 쓴 암시인지, 단순한 장난인지 확정되지 않았다.",
+            "전시 영국의 분위기 속에서 스파이설과 범죄설이 함께 제기되었다."
+        ],
+        "question": "익명의 문구가 사건을 유명하게 만들 때, 그 문구는 단서일까 아니면 또 하나의 미스터리일까?",
+        "source": "https://en.wikipedia.org/wiki/Who_put_Bella_in_the_Wych_Elm%3F",
+        "theme": "신원미상",
+        "unsolved": [
+            "여성의 신원과 사망 경위가 확정되지 않았다.",
+            "낙서를 쓴 사람이 사건에 대해 실제 정보를 알고 있었는지 알 수 없다.",
+            "나무 속에 유해가 숨겨진 방식과 범인의 동기가 불분명하다."
+        ]
+    },
+    {
+        "title": "서클빌 편지 사건",
+        "region": "해외",
+        "place": "미국 오하이오",
+        "year": "1970년대",
+        "category": "해외 미제범죄",
+        "status": "논쟁",
+        "difficulty": "보통",
+        "intro": "한 지역 주민들에게 협박성 편지가 지속적으로 보내진 사건.",
+        "clues": [
+            "미국 오하이오의 작은 도시에서 주민들에게 협박성 편지가 오랫동안 보내진 사건이다.",
+            "한 인물이 처벌받았지만, 그 이후에도 편지가 계속되었다는 주장이 있어 논란이 남았다.",
+            "필체, 우편 경로, 사적인 관계, 지역사회 소문이 모두 사건의 일부가 되었다."
+        ],
+        "question": "익명 편지 사건에서 ‘글씨’보다 더 중요한 단서는 편지의 내용일까, 편지가 도착한 사회적 맥락일까?",
+        "source": "https://en.wikipedia.org/wiki/Circleville_letters",
+        "theme": "괴문서",
+        "unsolved": [
+            "모든 편지가 같은 사람에게서 온 것인지 확정하기 어렵다.",
+            "처벌받은 사람이 실제 주범인지, 일부만 관련되었는지 논쟁이 남았다.",
+            "작은 지역사회에서 소문과 사적 갈등이 수사를 어떻게 흔들었는지도 문제다."
+        ]
+    },
+    {
+        "title": "텍사카나 문라이트 사건",
+        "region": "해외",
+        "place": "미국 텍사스·아칸소 접경",
+        "year": "1946",
+        "category": "해외 미제범죄",
+        "status": "미제",
+        "difficulty": "보통",
+        "intro": "작은 도시 일대에서 벌어진 연쇄 공격 사건으로 팬텀 킬러라는 별칭이 붙었다.",
+        "clues": [
+            "1946년 텍사카나 일대에서 밤 시간대 연쇄 공격이 발생하며 ‘팬텀 킬러’라는 별칭이 붙었다.",
+            "범인의 복장과 야간 공격 방식은 도시 전체의 공포를 키웠다.",
+            "영화와 전설화 과정을 거치며 실제 사건과 대중문화 이미지가 섞였다."
+        ],
+        "question": "공포가 확산된 도시에서 사람들의 기억은 더 정확해질까, 아니면 더 극적으로 재구성될까?",
+        "source": "https://en.wikipedia.org/wiki/Texarkana_Moonlight_Murders",
+        "theme": "연쇄·미제",
+        "unsolved": [
+            "범인의 신원은 확정되지 않았다.",
+            "모든 공격이 같은 인물의 소행인지 완전히 닫힌 문제는 아니다.",
+            "당시 공포 분위기 속 목격담의 신뢰성을 평가하기 어렵다."
+        ]
+    },
+    {
+        "title": "빌리스카 사건",
+        "region": "해외",
+        "place": "미국 아이오와",
+        "year": "1912",
+        "category": "해외 미제범죄",
+        "status": "미제",
+        "difficulty": "어려움",
+        "intro": "작은 마을의 한 집에서 가족과 손님들이 사망한 채 발견된 미제사건.",
+        "clues": [
+            "아이오와의 작은 마을 가정집에서 가족과 손님들이 사망한 채 발견된 사건이다.",
+            "용의자들이 거론되었지만 확정적 판결로 이어지지 않았고 사건은 미제로 남았다.",
+            "현장은 현재까지도 미국의 유명한 미스터리 장소로 소비되고 있다."
+        ],
+        "question": "비극적 사건이 관광 콘텐츠가 될 때, 호기심과 피해자 존중 사이의 선은 어디에 있어야 할까?",
+        "source": "https://en.wikipedia.org/wiki/Villisca_axe_murders",
+        "theme": "가정집·미제",
+        "unsolved": [
+            "범인이 누구인지 확정되지 않았다.",
+            "범행 동기와 피해자 선택 이유가 불분명하다.",
+            "사건이 관광·괴담화되면서 실제 피해자 중심의 기억이 흐려지는 문제도 있다."
+        ]
+    },
+    {
+        "title": "보이니치 필사본",
+        "region": "해외",
+        "place": "예일대 소장",
+        "year": "15세기 추정",
+        "category": "암호·문서·고고학",
+        "status": "미해독",
+        "difficulty": "어려움",
+        "intro": "알 수 없는 문자와 식물 그림으로 가득한 중세 필사본.",
+        "clues": [
+            "알 수 없는 문자와 식물·천문·인체처럼 보이는 그림이 가득한 중세 필사본이다.",
+            "문자 배열에는 규칙성이 있어 완전한 낙서로 보기 어렵다는 분석이 있지만, 실제 언어인지 암호인지 확정되지 않았다.",
+            "수많은 해독 주장이 있었지만 학계가 널리 받아들인 결정적 해석은 없다."
+        ],
+        "question": "해독되지 않은 문서를 볼 때, 우리는 ‘의미가 있을 것’이라는 기대 때문에 패턴을 과잉 해석하고 있지는 않을까?",
+        "source": "https://beinecke.library.yale.edu/collections/highlights/voynich-manuscript",
+        "theme": "암호·문서",
+        "unsolved": [
+            "문자가 실제 언어인지, 인공 암호인지, 의미 없는 모방인지 확정되지 않았다.",
+            "그림 속 식물과 도표가 무엇을 가리키는지 알 수 없다.",
+            "저자와 제작 목적도 명확하지 않다."
+        ]
+    },
+    {
+        "title": "크립토스 조각",
+        "region": "해외",
+        "place": "미국 CIA 본부",
+        "year": "1990",
+        "category": "암호·문서·고고학",
+        "status": "일부 미해독",
+        "difficulty": "어려움",
+        "intro": "CIA 본부에 설치된 암호 조각으로, 네 개의 암호 중 일부가 오랫동안 미해독 상태로 남아 있다.",
+        "clues": [
+            "CIA 본부에 설치된 조각 작품으로, 암호문 네 구역 중 일부가 아직 완전히 해독되지 않았다.",
+            "처음 세 부분은 풀렸지만 마지막 K4는 수십 년간 암호 해독가들을 붙잡고 있다.",
+            "작가가 힌트를 제공했음에도 결정적 해독은 나오지 않았다."
+        ],
+        "question": "풀리지 않는 암호의 매력은 정답 자체에 있을까, 수많은 사람이 정답에 접근하는 과정에 있을까?",
+        "source": "https://www.cia.gov/legacy/headquarters/kryptos-sculpture/",
+        "theme": "암호",
+        "unsolved": [
+            "K4의 최종 평문이 무엇인지 아직 공식적으로 풀리지 않았다.",
+            "해독에 필요한 방식이 고전 암호인지, 추가적인 물리적 단서가 필요한지 논쟁이 있다.",
+            "작가의 힌트를 어디까지 믿고 사용할지도 문제다."
+        ]
+    },
+    {
+        "title": "시카다 3301",
+        "region": "해외",
+        "place": "인터넷",
+        "year": "2012",
+        "category": "자연·괴현상·인터넷",
+        "status": "정체 미상",
+        "difficulty": "어려움",
+        "intro": "암호, 문학, 스테가노그래피, 실제 장소 포스터가 결합된 인터넷 퍼즐 현상.",
+        "clues": [
+            "인터넷에 등장한 난해한 퍼즐로, 암호학·문학·스테가노그래피·실제 장소 포스터가 결합되었다.",
+            "참가자들은 온라인 문제를 풀고 실제 도시의 포스터를 찾아가는 방식으로 다음 단계에 접근했다.",
+            "배후 조직의 목적이 채용인지 예술 프로젝트인지 사회실험인지 확정되지 않았다."
+        ],
+        "question": "인터넷 시대의 미스터리는 왜 ‘사건’보다 ‘참여형 게임’처럼 확산될까?",
+        "source": "https://en.wikipedia.org/wiki/Cicada_3301",
+        "theme": "인터넷·퍼즐",
+        "unsolved": [
+            "시카다 3301의 운영 주체가 누구인지 확인되지 않았다.",
+            "최종적으로 선발된 사람들이 무엇을 했는지 명확하지 않다.",
+            "퍼즐의 목적이 실제 조직 운영인지, 정교한 퍼포먼스인지 불분명하다."
+        ]
+    },
+    {
+        "title": "와우! 신호",
+        "region": "해외",
+        "place": "우주 전파 관측",
+        "year": "1977",
+        "category": "자연·괴현상·인터넷",
+        "status": "미확정",
+        "difficulty": "보통",
+        "intro": "SETI 관측 중 기록된 강한 협대역 전파 신호로, 기록지에 Wow!라고 적힌 데서 이름이 붙었다.",
+        "clues": [
+            "1977년 SETI 관측 중 강한 협대역 전파 신호가 기록되었고, 관측자가 출력지에 ‘Wow!’라고 적으며 이름이 붙었다.",
+            "신호는 외계 지적 생명체 가능성 논의에서 상징적 사례가 되었지만 반복 관측되지 않았다.",
+            "자연 천체, 인공 전파, 관측 조건 등 여러 설명이 제기되었다."
+        ],
+        "question": "과학에서 단 한 번 관측된 강력한 신호는 발견일까, 흥미로운 예외일까?",
+        "source": "https://en.wikipedia.org/wiki/Wow!_signal",
+        "theme": "우주·신호",
+        "unsolved": [
+            "신호의 정확한 발생 원인이 확정되지 않았다.",
+            "반복되지 않았기 때문에 독립 검증이 어렵다.",
+            "외계 신호 가능성을 배제할 수 있는지, 또는 과학적으로 보류해야 하는지가 쟁점이다."
+        ]
+    },
+    {
+        "title": "맥스 헤드룸 방송 침입",
+        "region": "해외",
+        "place": "미국 시카고",
+        "year": "1987",
+        "category": "자연·괴현상·인터넷",
+        "status": "미제",
+        "difficulty": "보통",
+        "intro": "정체불명의 인물이 TV 방송 신호를 가로채 기괴한 영상을 내보낸 사건.",
+        "clues": [
+            "1987년 시카고 지역 TV 방송이 정체불명의 영상으로 가로채진 사건이다.",
+            "당시 방송 신호를 납치하려면 기술 지식과 장비 접근성이 필요했을 것으로 추정된다.",
+            "영상의 기괴함과 범인의 미검거가 결합해 인터넷 시대 이후 다시 유명해졌다."
+        ],
+        "question": "짧은 장난성 사건이 수십 년간 기억되는 이유는 기술적 대담함 때문일까, 정체불명성 때문일까?",
+        "source": "https://en.wikipedia.org/wiki/Max_Headroom_signal_hijacking",
+        "theme": "방송·해킹",
+        "unsolved": [
+            "방송 침입을 실행한 사람의 신원은 확인되지 않았다.",
+            "어떤 장비와 장소를 이용했는지 구체적으로 확정되지 않았다.",
+            "단순 장난인지, 특정 메시지를 담은 행동인지도 불분명하다."
+        ]
+    },
+    {
+        "title": "오크 아일랜드 미스터리",
+        "region": "해외",
+        "place": "캐나다 노바스코샤",
+        "year": "1795년경부터",
+        "category": "암호·문서·고고학",
+        "status": "미확정",
+        "difficulty": "보통",
+        "intro": "섬에 숨겨진 보물과 지하 구조물을 둘러싸고 수백 년간 발굴과 추측이 이어진 이야기.",
+        "clues": [
+            "캐나다 노바스코샤의 오크 아일랜드는 숨겨진 보물과 지하 구조물 전설로 유명하다.",
+            "머니 핏, 침수 구조, 발견된 유물들이 반복적으로 해석되며 수백 년간 발굴이 이어졌다.",
+            "실제 역사적 흔적과 과장된 보물 전설이 뒤섞여 있다."
+        ],
+        "question": "보물 전설은 증거가 부족해도 왜 계속 사람들을 땅을 파게 만들까?",
+        "source": "https://en.wikipedia.org/wiki/Oak_Island_mystery",
+        "theme": "보물·탐사",
+        "unsolved": [
+            "섬에 실제로 대규모 보물이 숨겨져 있는지 확인되지 않았다.",
+            "발견된 구조물이 인공적 보물 장치인지 자연 지형과 후대 작업의 결과인지 논쟁이 있다.",
+            "전설이 발굴을 이끌고, 발굴 흔적이 다시 전설을 강화하는 순환이 있다."
+        ]
+    },
+    {
+        "title": "파이스토스 원반",
+        "region": "해외",
+        "place": "크레타",
+        "year": "기원전 2천년대 추정",
+        "category": "암호·문서·고고학",
+        "status": "미해독",
+        "difficulty": "어려움",
+        "intro": "나선형으로 찍힌 기호가 새겨진 고대 원반으로, 의미와 용도가 명확하지 않다.",
+        "clues": [
+            "크레타에서 발견된 원반으로, 나선형 배열의 기호가 찍혀 있다.",
+            "기호가 반복되지만 자료가 거의 하나뿐이라 언어인지 의례용 표식인지 해독이 어렵다.",
+            "진품성, 용도, 읽는 방향, 언어 계통 등 여러 문제에 다양한 주장이 있다."
+        ],
+        "question": "단 하나의 자료만 남은 문자 체계는 과학적으로 해독될 수 있을까, 아니면 영원히 추정에 머물 수밖에 없을까?",
+        "source": "https://en.wikipedia.org/wiki/Phaistos_Disc",
+        "theme": "고고학·문자",
+        "unsolved": [
+            "기호들이 실제 문자인지 확정되지 않았다.",
+            "읽는 방법과 언어적 배경을 알 수 없다.",
+            "비슷한 자료가 거의 없어 비교 연구가 제한된다."
+        ]
+    },
+    {
+        "title": "슈그버러 비문",
+        "region": "해외",
+        "place": "영국 스태퍼드셔",
+        "year": "18세기",
+        "category": "암호·문서·고고학",
+        "status": "미해독",
+        "difficulty": "보통",
+        "intro": "영국 저택 기념물에 새겨진 짧은 알파벳 배열이 다양한 해석을 낳은 미스터리.",
+        "clues": [
+            "영국 슈그버러 저택의 기념물에 새겨진 짧은 알파벳 배열이 여러 해석을 낳았다.",
+            "D O U O S V A V V M이라는 짧은 문자열은 성배설, 가족 추모문, 라틴어 약어설 등으로 해석되어 왔다.",
+            "문장이 너무 짧아 해독 후보를 검증하기 어렵다는 점이 핵심 한계다."
+        ],
+        "question": "짧은 문구의 미스터리는 정답이 없어서 어려운 걸까, 가능한 정답이 너무 많아서 어려운 걸까?",
+        "source": "https://en.wikipedia.org/wiki/Shugborough_inscription",
+        "theme": "암호·비문",
+        "unsolved": [
+            "문자열의 정확한 의미가 확정되지 않았다.",
+            "비문이 사적인 약어인지, 암호인지, 장식적 문구인지 알 수 없다.",
+            "짧은 암호는 가능한 해석이 너무 많아 오히려 검증이 어렵다."
+        ]
+    }
+];
+
+    const state = {
+      currentIndex: 0,
+      currentStage: 0,
+      answerShown: false,
+      completed: JSON.parse(localStorage.getItem("mysteryCompletedV3") || "[]")
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    const caseTitle = $("caseTitle");
+    const tagRow = $("tagRow");
+    const caseIntro = $("caseIntro");
+    const caseYear = $("caseYear");
+    const casePlace = $("casePlace");
+    const caseStatus = $("caseStatus");
+    const sourceLink = $("sourceLink");
+    const answerBtn = $("answerBtn");
+    const stageBtn = $("stageBtn");
+    const completeBtn = $("completeBtn");
+    const stageContainer = $("stageContainer");
+    const stageCountText = $("stageCountText");
+    const stageDots = $("stageDots");
+    const caseList = $("caseList");
+    const progressText = $("progressText");
+    const searchInput = $("searchInput");
+    const regionFilter = $("regionFilter");
+    const categoryFilter = $("categoryFilter");
+    const difficultyFilter = $("difficultyFilter");
+
+    function uniqueValues(key) {
+      return [...new Set(cases.map(item => item[key]))].sort();
+    }
+
+    function fillSelect(select, values) {
+      values.forEach(value => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        select.appendChild(option);
+      });
+    }
+
+    fillSelect(regionFilter, uniqueValues("region"));
+    fillSelect(categoryFilter, uniqueValues("category"));
+    fillSelect(difficultyFilter, uniqueValues("difficulty"));
+
+    function clean(text) {
+      return String(text || "").replace(/\s+/g, " ").trim();
+    }
+
+    function buildStages(item) {
+      const clues = item.clues.map(clean).filter(Boolean);
+      const unsolved = item.unsolved.map(clean).filter(Boolean);
+
+      const stages = [
+        {
+          title: "1단계. 사건의 시작점",
+          clues: [
+            item.intro,
+            clues[0]
+          ],
+          question: "이 사건을 처음 접했을 때 가장 먼저 확인해야 할 핵심 사실은 무엇일까?",
+          answer: `${item.title}의 출발점은 ‘무슨 일이 일어났는지’보다 ‘마지막으로 확인된 상황이 어디까지인지’를 정리하는 데 있어. ${clues[0]} 그래서 이 단계에서는 추측보다 시간, 장소, 마지막 목격 또는 기록처럼 확인 가능한 기준점을 먼저 잡아야 해.`
+        },
+        {
+          title: "2단계. 단서가 남긴 빈틈",
+          clues: [
+            clues[1],
+            clues[2]
+          ],
+          question: "이 단서들은 왜 사건을 단순한 사고나 단순한 범죄로 쉽게 결론 내리지 못하게 만들까?",
+          answer: `핵심은 단서가 하나의 방향으로만 이어지지 않는다는 점이야. ${clues[1]} 또한 ${clues[2]} 이런 요소가 겹치면 특정 가설 하나로 사건 전체를 설명하기 어려워지고, 여러 가능성을 동시에 남기게 돼.`
+        },
+        {
+          title: "3단계. 아직 풀리지 않은 부분",
+          clues: [
+            unsolved[0],
+            unsolved[1]
+          ],
+          question: "지금까지 알려진 정보만으로 결론을 내리기 어려운 가장 큰 이유는 무엇일까?",
+          answer: `아직 남은 핵심 빈틈은 ${unsolved[0]} 그리고 ${unsolved[1]} 이 부분이 해결되지 않으면 사건의 ‘결과’는 알 수 있어도, 그 결과에 이르게 된 구체적인 과정은 확정하기 어려워.`
+        }
+      ];
+
+      if (item.difficulty === "어려움") {
+        stages.push({
+          title: "4단계. 해석의 한계",
+          clues: [
+            unsolved[2],
+            `현재 상태는 ‘${item.status}’로 정리되지만, 이 표현은 사건이 완전히 설명되었다는 뜻은 아닐 수 있다.`
+          ],
+          question: "이 사건에서 사람들이 계속 의문을 갖는 지점은 사실의 부족 때문일까, 아니면 해석의 충돌 때문일까?",
+          answer: `둘 다 작용해. ${unsolved[2]} 여기에 사건의 현재 상태가 ‘${item.status}’라는 점까지 고려하면, 남은 의문은 단순히 정보가 부족해서만 생긴 것이 아니라 같은 단서를 두고 서로 다른 해석이 가능하기 때문에 지속되는 경우가 많아.`
+        });
+      }
+
+      stages.push({
+        title: "그렇다면..",
+        final: true,
+        clues: unsolved,
+        question: item.question,
+        answer: ""
+      });
+
+      return stages;
+    }
+
+    function getCurrentItem() {
+      return cases[state.currentIndex];
+    }
+
+    function getCurrentStages() {
+      return buildStages(getCurrentItem());
+    }
+
+    function getFilteredCases() {
+      const keyword = searchInput.value.trim().toLowerCase();
+      return cases.filter(item => {
+        const targetText = [
+          item.title, item.region, item.place, item.year,
+          item.category, item.theme, item.status, item.difficulty,
+          item.intro, item.clues.join(" "), item.unsolved.join(" "), item.question
+        ].join(" ").toLowerCase();
+        return (!keyword || targetText.includes(keyword)) &&
+          (regionFilter.value === "전체" || item.region === regionFilter.value) &&
+          (categoryFilter.value === "전체" || item.category === categoryFilter.value) &&
+          (difficultyFilter.value === "전체" || item.difficulty === difficultyFilter.value);
+      });
+    }
+
+    function setCompleteButton() {
+      const done = state.completed.includes(state.currentIndex);
+      completeBtn.textContent = done ? "완료됨 ✓ 다시 누르면 해제" : "탐험 완료";
+      completeBtn.className = done ? "danger-soft" : "secondary";
+    }
+
+    function renderStage() {
+      const item = getCurrentItem();
+      const stages = getCurrentStages();
+      const stage = stages[state.currentStage];
+      const isFinal = !!stage.final;
+
+      stageCountText.textContent = isFinal
+        ? `마지막 질문 · 총 ${stages.length - 1}단계 탐험 완료`
+        : `${state.currentStage + 1} / ${stages.length - 1} 단계`;
+
+      stageDots.innerHTML = "";
+      stages.forEach((_, index) => {
+        const dot = document.createElement("span");
+        dot.className = "dot";
+        if (index < state.currentStage) dot.classList.add("done");
+        if (index === state.currentStage) dot.classList.add("active");
+        stageDots.appendChild(dot);
+      });
+
+      if (isFinal) {
+        stageContainer.innerHTML = `
+          <div class="section-box final-card">
+            <h3 class="final-title">그렇다면..</h3>
+            <div class="section-title">마지막으로 남는 미해결 지점</div>
+            <ul class="unsolved-list">
+              ${stage.clues.map(text => `<li>${text}</li>`).join("")}
+            </ul>
+            <div class="question-card"><strong>질문.</strong> ${stage.question}</div>
+          </div>
+        `;
+        answerBtn.style.display = "none";
+        stageBtn.textContent = "처음 단계로";
+        stageBtn.disabled = false;
+        return;
+      }
+
+      stageContainer.innerHTML = `
+        <div class="section-box clue-box">
+          <h3 class="stage-title">${stage.title}</h3>
+          <div class="section-title">단서</div>
+          <ol class="clue-list">
+            ${stage.clues.map(text => `<li>${text}</li>`).join("")}
+          </ol>
+        </div>
+
+        <div class="question-card"><strong>질문.</strong> ${stage.question}</div>
+        <div class="answer-card" id="answerCard"><strong>답변.</strong> ${stage.answer}</div>
+      `;
+
+      answerBtn.style.display = "inline-flex";
+      answerBtn.textContent = state.answerShown ? "답변 숨기기" : "답변보기";
+      stageBtn.textContent = "다음 단계";
+      stageBtn.disabled = !state.answerShown;
+
+      const answerCard = $("answerCard");
+      if (state.answerShown) answerCard.classList.add("show");
+    }
+
+    function renderCase(index) {
+      state.currentIndex = index;
+      state.currentStage = 0;
+      state.answerShown = false;
+
+      const item = getCurrentItem();
+      caseTitle.textContent = item.title;
+      caseIntro.textContent = item.intro;
+      caseYear.textContent = item.year;
+      casePlace.textContent = item.place;
+      caseStatus.textContent = item.status;
+      sourceLink.href = item.source;
+
+      tagRow.innerHTML = "";
+      [item.region, item.category, item.theme, item.difficulty].forEach(tag => {
+        const span = document.createElement("span");
+        span.className = "tag" + (tag === item.difficulty ? " difficulty" : "");
+        span.textContent = tag;
+        tagRow.appendChild(span);
+      });
+
+      setCompleteButton();
+      renderStage();
+      renderList();
+    }
+
+    function renderList() {
+      const filtered = getFilteredCases();
+      caseList.innerHTML = "";
+
+      if (filtered.length === 0) {
+        caseList.innerHTML = '<div class="empty">검색 결과가 없어.</div>';
+      } else {
+        filtered.forEach(item => {
+          const realIndex = cases.indexOf(item);
+          const btn = document.createElement("button");
+          btn.className = "case-item";
+          if (realIndex === state.currentIndex) btn.classList.add("active");
+          if (state.completed.includes(realIndex)) btn.classList.add("done");
+          btn.innerHTML = `
+            <div class="case-item-title">${item.title}</div>
+            <div class="case-item-sub">${item.year} · ${item.place} · ${item.category} · ${item.difficulty}</div>
+          `;
+          btn.addEventListener("click", () => renderCase(realIndex));
+          caseList.appendChild(btn);
+        });
+      }
+
+      progressText.textContent = `${state.completed.length} / ${cases.length} 완료`;
+    }
+
+    function toggleAnswer() {
+      const stages = getCurrentStages();
+      if (stages[state.currentStage].final) return;
+
+      state.answerShown = !state.answerShown;
+      renderStage();
+    }
+
+    function nextStage() {
+      const stages = getCurrentStages();
+      const isFinal = stages[state.currentStage].final;
+
+      if (isFinal) {
+        state.currentStage = 0;
+        state.answerShown = false;
+      } else if (state.currentStage < stages.length - 1) {
+        state.currentStage++;
+        state.answerShown = false;
+      }
+
+      renderStage();
+    }
+
+    function toggleCompleteCase() {
+      const existingIndex = state.completed.indexOf(state.currentIndex);
+      if (existingIndex >= 0) {
+        state.completed.splice(existingIndex, 1);
+      } else {
+        state.completed.push(state.currentIndex);
+      }
+      localStorage.setItem("mysteryCompletedV3", JSON.stringify(state.completed));
+      setCompleteButton();
+      renderList();
+    }
+
+    function randomCase() {
+      const filtered = getFilteredCases();
+      if (filtered.length === 0) {
+        alert("현재 필터에 맞는 사건이 없어.");
+        return;
+      }
+      const selected = filtered[Math.floor(Math.random() * filtered.length)];
+      renderCase(cases.indexOf(selected));
+    }
+
+    function nextCase() {
+      renderCase((state.currentIndex + 1) % cases.length);
+    }
+
+    function resetProgress() {
+      if (!confirm("탐험 완료 기록을 초기화할까?")) return;
+      state.completed = [];
+      localStorage.removeItem("mysteryCompletedV3");
+      setCompleteButton();
+      renderList();
+    }
+
+    [searchInput, regionFilter, categoryFilter, difficultyFilter].forEach(element => {
+      element.addEventListener("input", renderList);
+      element.addEventListener("change", renderList);
+    });
+
+    answerBtn.addEventListener("click", toggleAnswer);
+    stageBtn.addEventListener("click", nextStage);
+    completeBtn.addEventListener("click", toggleCompleteCase);
+    $("randomBtn").addEventListener("click", randomCase);
+    $("nextBtn").addEventListener("click", nextCase);
+    $("resetBtn").addEventListener("click", resetProgress);
+
+    renderCase(0);
+  </script>
+</body>
+</html>
